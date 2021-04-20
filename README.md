@@ -182,3 +182,9 @@ positioned near TM 6 and/or TM 7. A model of IAS binding to the beta 2AR is prop
 
 ## Knowledge Graph results
 ![kG](KG.png)
+
+## Resources
+[BLUE, the Biomedical Language Understanding Evaluation benchmark](https://github.com/ncbi-nlp/BLUE_Benchmark)
+
+[Chemical-protein Interaction Extraction 
+via Gaussian Probability Distribution and External Biomedical Knowledge](https://github.com/CongSun-dlut/CPI_extraction)

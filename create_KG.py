@@ -42,4 +42,4 @@ G = nx.from_pandas_edgelist(kg_df, source="Arg1", target="Arg2", edge_attr="CPR 
 plt.figure(figsize=(12, 12))
 pos = nx.spring_layout(G, k=0.5)  # k regulates the distance between nodes
 nx.draw(G, with_labels=True, node_color='skyblue', node_size=1500, edge_cmap=plt.cm.Blues, pos=pos)
-plt.savefig("KG.png")
+# plt.savefig("KG.png")
