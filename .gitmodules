@@ -1,0 +1,9 @@
+[submodule "CPI_extraction"]
+	path = CPI_extraction
+	url = https://github.com/wenyuan-wu/CPI_extraction.git
+[submodule "biocreative-vi-track-5-chemprot"]
+	path = biocreative-vi-track-5-chemprot
+	url = https://github.com/wenyuan-wu/biocreative-vi-track-5-chemprot.git
+[submodule "scibert"]
+	path = scibert
+	url = https://github.com/wenyuan-wu/scibert.git
