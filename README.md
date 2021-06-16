@@ -1,4 +1,4 @@
-# ChemProt Testing Ground
+# ChemProt/DrugProt Testing Ground
 Testing ground for [task 5](https://biocreative.bioinformatics.udel.edu/tasks/biocreative-vi/track-5/) from BioCreative VI
 > Task 5: Text mining chemical-protein interactions (CHEMPROT)
 >
