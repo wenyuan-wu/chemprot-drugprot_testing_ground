@@ -81,8 +81,9 @@ layer_i = 5
 vec = hidden_states[layer_i][batch_i][token_i]
 
 # Plot the values as a histogram to show their distribution.
-plt.figure(figsize=(10, 10))
-plt.hist(vec, bins=200)
+# TODO: runs slowly
+# plt.figure(figsize=(10, 10))
+# plt.hist(vec, bins=200)
 # plt.show()
 
 # `hidden_states` is a Python list.
@@ -90,3 +91,20 @@ print('Type of hidden_states: ', type(hidden_states))
 
 # Each layer in the list is a torch tensor.
 print('Tensor shape for each layer: ', hidden_states[0].size())
+
+# Concatenate the tensors for all layers. We use `stack` here to
+# create a new dimension in the tensor.
+token_embeddings = torch.stack(hidden_states, dim=0)
+
+print(token_embeddings.size())
+
+# Remove dimension 1, the "batches".
+token_embeddings = torch.squeeze(token_embeddings, dim=1)
+
+print(token_embeddings.size())
+
+# Swap dimensions 0 and 1.
+token_embeddings = token_embeddings.permute(1,0,2)
+
+print(token_embeddings.size())
+
