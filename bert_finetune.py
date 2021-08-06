@@ -297,16 +297,22 @@ for epoch_i in range(0, epochs):
         model.zero_grad()
 
         # Perform a forward pass (evaluate the model on this training batch).
-        # The documentation for this `model` function is here:
-        # https://huggingface.co/transformers/v2.2.0/model_doc/bert.html#transformers.BertForSequenceClassification
-        # It returns different numbers of parameters depending on what arguments
-        # arge given and what flags are set. For our useage here, it returns
-        # the loss (because we provided labels) and the "logits"--the model
-        # outputs prior to activation.
-        loss, logits = model(b_input_ids,
-                             token_type_ids=None,
-                             attention_mask=b_input_mask,
-                             labels=b_labels)
+        # In PyTorch, calling `model` will in turn call the model's `forward`
+        # function and pass down the arguments. The `forward` function is
+        # documented here:
+        # https://huggingface.co/transformers/model_doc/bert.html#bertforsequenceclassification
+        # The results are returned in a results object, documented here:
+        # https://huggingface.co/transformers/main_classes/output.html#transformers.modeling_outputs.SequenceClassifierOutput
+        # Specifically, we'll get the loss (because we provided labels) and the
+        # "logits"--the model outputs prior to activation.
+        result = model(b_input_ids,
+                       token_type_ids=None,
+                       attention_mask=b_input_mask,
+                       labels=b_labels,
+                       return_dict=True)
+
+        loss = result.loss
+        logits = result.logits
 
         # Accumulate the training loss over all of the batches so that we can
         # calculate the average loss at the end. `loss` is a Tensor containing a
@@ -380,14 +386,17 @@ for epoch_i in range(0, epochs):
             # Forward pass, calculate logit predictions.
             # token_type_ids is the same as the "segment ids", which
             # differentiates sentence 1 and 2 in 2-sentence tasks.
-            # The documentation for this `model` function is here:
-            # https://huggingface.co/transformers/v2.2.0/model_doc/bert.html#transformers.BertForSequenceClassification
-            # Get the "logits" output by the model. The "logits" are the output
-            # values prior to applying an activation function like the softmax.
-            (loss, logits) = model(b_input_ids,
-                                   token_type_ids=None,
-                                   attention_mask=b_input_mask,
-                                   labels=b_labels)
+            result = model(b_input_ids,
+                           token_type_ids=None,
+                           attention_mask=b_input_mask,
+                           labels=b_labels,
+                           return_dict=True)
+
+        # Get the loss and "logits" output by the model. The "logits" are the
+        # output values prior to applying an activation function like the
+        # softmax.
+        loss = result.loss
+        logits = result.logits
 
         # Accumulate the validation loss.
         total_eval_loss += loss.item()
