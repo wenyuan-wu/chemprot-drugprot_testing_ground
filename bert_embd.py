@@ -2,6 +2,8 @@ import torch
 from transformers import BertTokenizer, BertModel
 import matplotlib.pyplot as plt
 import logging
+from scipy.spatial.distance import cosine
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -104,7 +106,73 @@ token_embeddings = torch.squeeze(token_embeddings, dim=1)
 print(token_embeddings.size())
 
 # Swap dimensions 0 and 1.
-token_embeddings = token_embeddings.permute(1,0,2)
+token_embeddings = token_embeddings.permute(1, 0, 2)
 
 print(token_embeddings.size())
+
+# Stores the token vectors, with shape [22 x 3,072]
+token_vecs_cat = []
+
+# `token_embeddings` is a [22 x 12 x 768] tensor.
+
+# For each token in the sentence...
+for token in token_embeddings:
+    # `token` is a [12 x 768] tensor
+
+    # Concatenate the vectors (that is, append them together) from the last
+    # four layers.
+    # Each layer vector is 768 values, so `cat_vec` is length 3,072.
+    cat_vec = torch.cat((token[-1], token[-2], token[-3], token[-4]), dim=0)
+
+    # Use `cat_vec` to represent `token`.
+    token_vecs_cat.append(cat_vec)
+
+print('Shape is: %d x %d' % (len(token_vecs_cat), len(token_vecs_cat[0])))
+
+# Stores the token vectors, with shape [22 x 768]
+token_vecs_sum = []
+
+# `token_embeddings` is a [22 x 12 x 768] tensor.
+
+# For each token in the sentence...
+for token in token_embeddings:
+    # `token` is a [12 x 768] tensor
+
+    # Sum the vectors from the last four layers.
+    sum_vec = torch.sum(token[-4:], dim=0)
+
+    # Use `sum_vec` to represent `token`.
+    token_vecs_sum.append(sum_vec)
+
+print('Shape is: %d x %d' % (len(token_vecs_sum), len(token_vecs_sum[0])))
+
+# `hidden_states` has shape [13 x 1 x 22 x 768]
+
+# `token_vecs` is a tensor with shape [22 x 768]
+token_vecs = hidden_states[-2][0]
+
+# Calculate the average of all 22 token vectors.
+sentence_embedding = torch.mean(token_vecs, dim=0)
+
+print("Our final sentence embedding vector of shape:", sentence_embedding.size())
+
+for i, token_str in enumerate(tokenized_text):
+    print(i, token_str)
+
+print('First 5 vector values for each instance of "bank".')
+print('')
+print("bank vault   ", str(token_vecs_sum[6][:5]))
+print("bank robber  ", str(token_vecs_sum[10][:5]))
+print("river bank   ", str(token_vecs_sum[19][:5]))
+
+# Calculate the cosine similarity between the word bank
+# in "bank robber" vs "river bank" (different meanings).
+diff_bank = 1 - cosine(token_vecs_sum[10], token_vecs_sum[19])
+
+# Calculate the cosine similarity between the word bank
+# in "bank robber" vs "bank vault" (same meaning).
+same_bank = 1 - cosine(token_vecs_sum[10], token_vecs_sum[6])
+
+print('Vector similarity for  *similar*  meanings:  %.2f' % same_bank)
+print('Vector similarity for *different* meanings:  %.2f' % diff_bank)
 
