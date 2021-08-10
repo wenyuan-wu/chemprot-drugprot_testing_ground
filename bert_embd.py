@@ -10,7 +10,8 @@ logging.basicConfig(level=logging.INFO)
 # Load pre-trained model tokenizer (vocabulary)
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
-text = "Here is the sentence I want embeddings for."
+text = "After stealing @GENE$ from the bank vault, the bank @DRUG$ was seen " \
+       "fishing on the Mississippi river bank."
 marked_text = "[CLS] " + text + " [SEP]"
 
 # Tokenize our sentence with the BERT tokenizer.
@@ -21,7 +22,7 @@ print(tokenized_text)
 print(list(tokenizer.vocab.keys())[5000:5020])
 
 # Define a new example sentence with multiple meanings of the word "bank"
-text = "After stealing money from the bank vault, the bank robber was seen " \
+text = "After stealing @GENE$ from the bank vault, the bank @DRUG$ was seen " \
        "fishing on the Mississippi river bank."
 
 # Add the special tokens.
