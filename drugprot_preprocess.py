@@ -1,5 +1,6 @@
 from util import get_df_from_data
 from spacy.lang.en import English
+import pprint
 
 data_set = "training"
 abs_df, ent_df, rel_df = get_df_from_data(data_set)
@@ -33,7 +34,6 @@ doc = nlp(complete)
 
 soi = 0
 data_dict = {}
-# TODO: debug
 for idx, sent in enumerate(doc.sents):
     sent = sent.text + " "
     eoi = len(sent) + soi
@@ -41,33 +41,33 @@ for idx, sent in enumerate(doc.sents):
     soi = eoi
 
     # check entities
+    ent_count = 0
+    ent_dict = {}
     for key, val in offset_to_ent_dict.items():
-        ent_count = 0
-        ent_dict = {}
         if check_sub_range(sent_range, key):
-            ent_dict = {val["Entity #"]: val}
+            ent_dict[val["Entity #"]] = val
             ent_count += 1
 
-            # some annotation could happen here
-            # check relations
-            rel_count = 0
+    # some annotation could happen here
 
-            for k, v in rel_dict.items():
-                if k[0] in ent_dict.keys() and k[1] in ent_dict.keys():
-                    rel_count += 1
-                    sent_id = int(str(pmid) + str(idx) + str(rel_count))
-                    data_dict[sent_id] = {"text_raw": sent,
-                                          "ent_count": ent_count,
-                                          "ent_dict": ent_dict,
-                                          "Relation": {v["Relation"]: v}
-                                          }
-                else:
-                    sent_id = int(str(pmid) + str(idx) + str(rel_count))
-                    data_dict[sent_id] = {"text_raw": sent,
-                                          "ent_count": ent_count,
-                                          "ent_dict": ent_dict,
-                                          "Relation": {}
-                                          }
-    # different kinds of annotations here
+    # check relations
+    rel_count = 0
+    for k, v in rel_dict.items():
+        if k[0] in ent_dict.keys() and k[1] in ent_dict.keys():
+            sent_id = int(str(pmid) + str(idx) + str(rel_count))
+            data_dict[sent_id] = {"text_raw": sent,
+                                  "ent_count": ent_count,
+                                  "ent_dict": ent_dict,
+                                  "Relation": {v["Relation"]: v}
+                                  }
+            rel_count += 1
+        else:
+            sent_id = int(str(pmid) + str(idx) + str(rel_count))
+            data_dict[sent_id] = {"text_raw": sent,
+                                  "ent_count": ent_count,
+                                  "ent_dict": ent_dict,
+                                  "Relation": {}
+                                  }
 
-print(data_dict)
+
+pprint.pprint(data_dict)
