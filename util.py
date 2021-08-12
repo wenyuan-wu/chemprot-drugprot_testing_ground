@@ -12,14 +12,14 @@ def get_df_from_data(data_set="training"):
 
     if data_set == "test":
         # Drugprot test set
-
+        data_path = join("data", "drugprot", "test-background")
         # abstracts
-        abs_file_name = join(data_path, "drugprot_" + data_set + "_abstracts" + ".tsv")
+        abs_file_name = join(data_path, "test_background" + "_abstracts" + ".tsv")
         abs_col_names = ["Title", "Abstract"]
         abs_df = pd.read_csv(abs_file_name, sep="\t", names=abs_col_names, index_col=0)
 
         # entity mention annotations
-        ent_file_name = join(data_path, "drugprot_" + data_set + "_entities" + ".tsv")
+        ent_file_name = join(data_path, "test_background" + "_entities" + ".tsv")
         ent_col_names = ["Entity #", "Type", "Start", "End", "Text"]
         ent_df = pd.read_csv(ent_file_name, sep="\t", names=ent_col_names, index_col=0)
 
