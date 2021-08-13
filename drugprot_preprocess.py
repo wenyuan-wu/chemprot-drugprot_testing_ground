@@ -1,18 +1,88 @@
-from util import get_df_from_data
 from spacy.lang.en import English
-import pprint
+from os.path import join
 import logging
 from tqdm import tqdm
 import pandas as pd
+import pickle
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO,
-                    datefmt='%d-%b-%y %H:%M:%S'
+                    # datefmt='%d-%b-%y %H:%M:%S'
                     )
+
+
+def get_df_from_data(data_set="training"):
+    """
+    Function to create pandas DataFrame from data files
+    :param data_set: string, type for dataset ["training", "development", "test"]
+    :return: pandas dataframe w.r.t. dataset
+    """
+    data_path = join("data", "drugprot", data_set)
+    # TODO: add logging info and doc string
+    # abstracts
+    abs_file_name = join(data_path, "drugprot_" + data_set + "_abstracts" + ".tsv")
+    logging.info(f"loading data from {abs_file_name}")
+    abs_col_names = ["Title", "Abstract"]
+    abs_df = pd.read_csv(abs_file_name, sep="\t", names=abs_col_names, index_col=0)
+
+    # entity mention annotations
+    ent_file_name = join(data_path, "drugprot_" + data_set + "_entities" + ".tsv")
+    ent_col_names = ["Entity #", "Type", "Start", "End", "Text"]
+    ent_df = pd.read_csv(ent_file_name, sep="\t", names=ent_col_names, index_col=0)
+
+    # drugprot detailed relation annotations
+    rel_file_name = join(data_path, "drugprot_" + data_set + "_relations" + ".tsv")
+    rel_col_names = ["Relation", "Arg1", "Arg2"]
+    rel_df = pd.read_csv(rel_file_name, sep="\t", names=rel_col_names, index_col=0)
+
+    return abs_df, ent_df, rel_df
+
+
+def get_df_from_data_test():
+    """
+    Function to create pandas DataFrame from data files
+    :param data_set: string, type for dataset ["training", "development", "test"]
+    :return: pandas dataframe w.r.t. dataset
+    """
+    # Drugprot test set
+    data_path = join("data", "drugprot", "test-background")
+
+    # abstracts
+    abs_file_name = join(data_path, "test_background" + "_abstracts" + ".tsv")
+    abs_col_names = ["Title", "Abstract"]
+    abs_df = pd.read_csv(abs_file_name, sep="\t", names=abs_col_names, index_col=0)
+
+    # entity mention annotations
+    ent_file_name = join(data_path, "test_background" + "_entities" + ".tsv")
+    ent_col_names = ["Entity #", "Type", "Start", "End", "Text"]
+    ent_df = pd.read_csv(ent_file_name, sep="\t", names=ent_col_names, index_col=0)
+
+    return abs_df, ent_df
 
 
 def check_sub_range(range_1, range_2):
     return set(range_1).intersection(set(range_2))
+
+
+def remove_tag():
+    raise NotImplementedError
+
+
+def save_to_file(tmp_dict, file_name):
+    file_path = join("data", "drugprot_preprocessed", "bin", file_name)
+    infile = open(file_path, 'wb')
+    pickle.dump(tmp_dict, infile)
+    logging.info(f"File saved in {file_path}")
+    infile.close()
+
+
+def load_from_file(file_name):
+    file_path = join("data", "drugprot_preprocessed", "bin", file_name)
+    outfile = open(file_path, 'rb')
+    logging.info(f"Loading file from {file_path}")
+    tmp_dict = pickle.load(outfile)
+    outfile.close()
+    return tmp_dict
 
 
 def create_data_dict(abs_df, ent_df, rel_df, annotation="None"):
@@ -31,7 +101,12 @@ def create_data_dict(abs_df, ent_df, rel_df, annotation="None"):
                 key = range(row["Start"], row["End"])
                 offset_to_ent_dict[key] = row.to_dict()
         except KeyError:
-            offset_to_ent_dict = {}
+            offset_to_ent_dict = {range(10240, 10241): {'Entity #': 'Null1',
+                                                        'Type': 'CHEMICAL',
+                                                        'Start': 10240,
+                                                        'End': 10241,
+                                                        'Text': 'placeholder'}
+                                  }
         except AttributeError:
             key = range(ent_df.loc[pmid]["Start"], ent_df.loc[pmid]["End"])
             offset_to_ent_dict[key] = ent_df.loc[pmid].to_dict()
@@ -42,7 +117,7 @@ def create_data_dict(abs_df, ent_df, rel_df, annotation="None"):
                 key = (row["Arg1"][5:], row["Arg2"][5:])
                 rel_dict[key] = row.to_dict()
         except KeyError:
-            rel_dict = {}
+            rel_dict = {('Null1', 'Null2'): {'Relation': 'Placeholder', 'Arg1': 'Arg1:Null1', 'Arg2': 'Arg2:Null2'}}
         except AttributeError:
             key = (rel_df.loc[pmid]["Arg1"][5:], rel_df.loc[pmid]["Arg2"][5:])
             rel_dict[key] = rel_df.loc[pmid].to_dict()
@@ -84,7 +159,7 @@ def create_data_dict(abs_df, ent_df, rel_df, annotation="None"):
                                           "Relation": {}
                                           }
 
-    # some annotation could happen here
+    # TODO: some annotation could happen here
     if annotation == "anoy":
         pass
 
@@ -94,32 +169,21 @@ def create_data_dict(abs_df, ent_df, rel_df, annotation="None"):
 def main():
     data_set = "training"
     abs_df, ent_df, rel_df = get_df_from_data(data_set)
-    # abs_df: [3500 rows x 3 columns]
-    # ent_df: [89529 rows x 6 columns]
-    # rel_df: [17274 rows x 4 columns]
     data_dict_train = create_data_dict(abs_df, ent_df, rel_df)
-    pprint.pprint(data_dict_train)
+    # pprint.pprint(data_dict_train)
+    save_to_file(data_dict_train, "train")
 
     data_set = "development"
     abs_df, ent_df, rel_df = get_df_from_data(data_set)
-    # abs_df: [3500 rows x 3 columns]
-    # ent_df: [89529 rows x 6 columns]
-    # rel_df: [17274 rows x 4 columns]
     data_dict_dev = create_data_dict(abs_df, ent_df, rel_df)
-    pprint.pprint(data_dict_dev)
+    save_to_file(data_dict_dev, "dev")
 
-    # TODO: get test set right
-    data_set = "test"
-    abs_df, ent_df = get_df_from_data(data_set)
+    abs_df, ent_df = get_df_from_data_test()
     column_names = ["a", "b", "c"]
-    rel_df = pd.DataFrame(columns = column_names)
-    # abs_df: [3500 rows x 3 columns]
-    # ent_df: [89529 rows x 6 columns]
-    # rel_df: [17274 rows x 4 columns]
+    rel_df = pd.DataFrame(columns=column_names)
     data_dict_test = create_data_dict(abs_df, ent_df, rel_df)
-    pprint.pprint(data_dict_test)
+    save_to_file(data_dict_test, "test")
 
 
 if __name__ == '__main__':
     main()
-
