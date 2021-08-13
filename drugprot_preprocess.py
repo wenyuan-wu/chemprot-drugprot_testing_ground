@@ -101,7 +101,7 @@ def create_data_dict(abs_df, ent_df, rel_df, annotation="None"):
                 key = range(row["Start"], row["End"])
                 offset_to_ent_dict[key] = row.to_dict()
         except KeyError:
-            offset_to_ent_dict = {range(10240, 10241): {'Entity #': 'Null1',
+            offset_to_ent_dict = {range(10240, 10241): {'Entity #': 'Null',
                                                         'Type': 'CHEMICAL',
                                                         'Start': 10240,
                                                         'End': 10241,
@@ -147,7 +147,8 @@ def create_data_dict(abs_df, ent_df, rel_df, annotation="None"):
                                           "ent_count": ent_count,
                                           "ent_dict": ent_dict,
                                           "rel_count": rel_count,
-                                          "Relation": {v["Relation"]: v}
+                                          "rel_dict": v,
+                                          "relation": v["Relation"]
                                           }
                     rel_count += 1
                 else:
@@ -156,7 +157,8 @@ def create_data_dict(abs_df, ent_df, rel_df, annotation="None"):
                                           "ent_count": ent_count,
                                           "ent_dict": ent_dict,
                                           "rel_count": rel_count,
-                                          "Relation": {}
+                                          "rel_dict": {},
+                                          "relation": "NONE"
                                           }
 
     # TODO: some annotation could happen here
