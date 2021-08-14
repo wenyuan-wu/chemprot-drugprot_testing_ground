@@ -3,7 +3,7 @@ from os.path import join
 import logging
 from tqdm import tqdm
 import pandas as pd
-import pickle
+from util import save_to_bin
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO,
@@ -66,23 +66,6 @@ def check_sub_range(range_1, range_2):
 
 def remove_tag():
     raise NotImplementedError
-
-
-def save_to_file(tmp_dict, file_name):
-    file_path = join("data", "drugprot_preprocessed", "bin", file_name)
-    infile = open(file_path, 'wb')
-    pickle.dump(tmp_dict, infile)
-    logging.info(f"File saved in {file_path}")
-    infile.close()
-
-
-def load_from_file(file_name):
-    file_path = join("data", "drugprot_preprocessed", "bin", file_name)
-    outfile = open(file_path, 'rb')
-    logging.info(f"Loading file from {file_path}")
-    tmp_dict = pickle.load(outfile)
-    outfile.close()
-    return tmp_dict
 
 
 def create_data_dict(abs_df, ent_df, rel_df, annotation="None"):
@@ -173,18 +156,18 @@ def main():
     abs_df, ent_df, rel_df = get_df_from_data(data_set)
     data_dict_train = create_data_dict(abs_df, ent_df, rel_df)
     # pprint.pprint(data_dict_train)
-    save_to_file(data_dict_train, "train")
+    save_to_bin(data_dict_train, "train")
 
     data_set = "development"
     abs_df, ent_df, rel_df = get_df_from_data(data_set)
     data_dict_dev = create_data_dict(abs_df, ent_df, rel_df)
-    save_to_file(data_dict_dev, "dev")
+    save_to_bin(data_dict_dev, "dev")
 
     abs_df, ent_df = get_df_from_data_test()
     column_names = ["a", "b", "c"]
     rel_df = pd.DataFrame(columns=column_names)
     data_dict_test = create_data_dict(abs_df, ent_df, rel_df)
-    save_to_file(data_dict_test, "test")
+    save_to_bin(data_dict_test, "test")
 
 
 if __name__ == '__main__':

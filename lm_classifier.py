@@ -1,7 +1,7 @@
 import torch
 import logging
 import pandas as pd
-from drugprot_preprocess import load_from_file
+from util import load_from_bin
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO,
@@ -16,4 +16,8 @@ if torch.cuda.is_available():
 else:
     logging.info('No GPU available, using the CPU instead.')
     device = torch.device("cpu")
+
+df_train = load_from_bin("train_drop_0.85")
+df_dev = load_from_bin("dev_drop_0.85")
+# print(df_train)
 
