@@ -1,31 +1,10 @@
-wget http://snap.stanford.edu/decagon/bio-decagon-combo.tar.gz
-tar -xzvf bio-decagon-combo.tar.gz
-rm bio-decagon-combo.tar.gz
+wget https://zenodo.org/record/5119892/files/drugprot-training-development-test-background.zip
+unzip drugprot-training-development-test-background.zip
+rm drugprot-training-development-test-background.zip
+mv drugprot-gs-training-development drugprot
 
+# rename files to fix typo in file names
+mv drugprot/training/drugprot_training_abstracs.tsv drugprot/training/drugprot_training_abstracts.tsv
+mv drugprot/development/drugprot_development_abstracs.tsv drugprot/development/drugprot_development_abstracts.tsv
 
-wget http://snap.stanford.edu/decagon/bio-decagon-ppi.tar.gz
-tar -xzvf bio-decagon-ppi.tar.gz
-rm bio-decagon-ppi.tar.gz
-
-
-wget http://snap.stanford.edu/decagon/bio-decagon-mono.tar.gz
-tar -xzvf bio-decagon-mono.tar.gz
-rm bio-decagon-mono.tar.gz
-
-
-wget http://snap.stanford.edu/decagon/bio-decagon-targets-all.tar.gz
-tar -xzvf bio-decagon-targets-all.tar.gz
-rm bio-decagon-targets-all.tar.gz
-
-
-wget http://snap.stanford.edu/decagon/bio-decagon-effectcategories.tar.gz
-tar -xzvf bio-decagon-effectcategories.tar.gz
-rm bio-decagon-effectcategories.tar.gz
-
-
-wget http://snap.stanford.edu/decagon/bio-decagon-targets.tar.gz
-tar -xzvf bio-decagon-targets.tar.gz
-rm bio-decagon-targets.tar.gz
-
-# redundant lines
-# mv bio*csv ../data
+echo "drugprot data downloaded"
