@@ -56,7 +56,7 @@ model = BertForSequenceClassification.from_pretrained(
 model = nn.DataParallel(model, device_ids=[0, 1])
 
 # # Tell pytorch to run this model on the GPU.
-# desc = model.cuda()
+desc = model.cuda()
 
 logging.info(f"GPU memory info:\n{check_gpu_mem()}")
 
