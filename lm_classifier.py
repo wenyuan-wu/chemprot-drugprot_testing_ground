@@ -28,7 +28,7 @@ else:
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
 
 # load data into dataloader
-batch_size = 32
+batch_size = 8
 train_dataset = create_tensor_dataset("train_drop_0.85", tokenizer)
 dev_dataset = create_tensor_dataset("dev_drop_0.85", tokenizer)
 train_dataloader = DataLoader(
