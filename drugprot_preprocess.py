@@ -4,6 +4,7 @@ import logging
 from tqdm import tqdm
 import pandas as pd
 from util import save_to_bin
+import pprint
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO,
@@ -157,6 +158,8 @@ def main():
     data_dict_train = create_data_dict(abs_df, ent_df, rel_df)
     # pprint.pprint(data_dict_train)
     save_to_bin(data_dict_train, "train")
+    # for debug purpose
+    # pprint.pprint(data_dict_train)
 
     data_set = "development"
     abs_df, ent_df, rel_df = get_df_from_data(data_set)
