@@ -17,6 +17,8 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
 
 
 def save_to_bin(tmp_dict, file_name):
+    # dir_path = join("data", "drugprot_preprocessed")
+    # os.mkdir(dir_path)
     file_path = join("data", "drugprot_preprocessed", "bin", file_name)
     infile = open(file_path, 'wb')
     pickle.dump(tmp_dict, infile)
@@ -117,7 +119,7 @@ def create_tensor_dataset(data_name, tokenizer):
     # Convert the lists into tensors.
     input_ids = torch.cat(input_ids, dim=0)
     attention_masks = torch.cat(attention_masks, dim=0)
-    labels = torch.tensor(labels)
+    labels = torch.tensor(labels, dtype=torch.long)
     dataset = TensorDataset(input_ids, attention_masks, labels)
 
     return dataset

@@ -28,7 +28,7 @@ else:
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
 
 # load data into dataloader
-batch_size = 8
+batch_size = 2
 train_dataset = create_tensor_dataset("train_drop_0.85", tokenizer)
 dev_dataset = create_tensor_dataset("dev_drop_0.85", tokenizer)
 train_dataloader = DataLoader(
@@ -132,6 +132,12 @@ for epoch_i in range(0, epochs):
         #   [0]: input ids
         #   [1]: attention masks
         #   [2]: labels
+        # debugging...
+        # print("="*45)
+        # print(batch)
+        # print(batch[0])
+        # print(batch[1])
+        # print(batch[2])
         b_input_ids = batch[0].to(device)
         b_input_mask = batch[1].to(device)
         b_labels = batch[2].to(device)
@@ -149,16 +155,22 @@ for epoch_i in range(0, epochs):
         model.zero_grad()
 
         # Perform a forward pass (evaluate the model on this training batch).
-        # The documentation for this `model` function is here:
-        # https://huggingface.co/transformers/v2.2.0/model_doc/bert.html#transformers.BertForSequenceClassification
-        # It returns different numbers of parameters depending on what arguments
-        # arge given and what flags are set. For our useage here, it returns
-        # the loss (because we provided labels) and the "logits"--the model
-        # outputs prior to activation.
-        loss, logits = model(b_input_ids,
-                             token_type_ids=None,
-                             attention_mask=b_input_mask,
-                             labels=b_labels)
+        # In PyTorch, calling `model` will in turn call the model's `forward`
+        # function and pass down the arguments. The `forward` function is
+        # documented here:
+        # https://huggingface.co/transformers/model_doc/bert.html#bertforsequenceclassification
+        # The results are returned in a results object, documented here:
+        # https://huggingface.co/transformers/main_classes/output.html#transformers.modeling_outputs.SequenceClassifierOutput
+        # Specifically, we'll get the loss (because we provided labels) and the
+        # "logits"--the model outputs prior to activation.
+        result = model(b_input_ids,
+                       token_type_ids=None,
+                       attention_mask=b_input_mask,
+                       labels=b_labels,
+                       return_dict=True)
+
+        loss = result.loss
+        logits = result.logits
 
         # Report GPU memory use for the first couple steps.
         if step < 2:

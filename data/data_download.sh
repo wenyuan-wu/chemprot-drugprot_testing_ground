@@ -7,4 +7,6 @@ mv drugprot-gs-training-development drugprot
 mv drugprot/training/drugprot_training_abstracs.tsv drugprot/training/drugprot_training_abstracts.tsv
 mv drugprot/development/drugprot_development_abstracs.tsv drugprot/development/drugprot_development_abstracts.tsv
 
+mkdir -p drugprot_preprocessed/bin
+
 echo "drugprot data downloaded"
