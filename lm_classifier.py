@@ -29,7 +29,7 @@ else:
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
 
 # load data into dataloader
-batch_size = 16
+batch_size = 8
 train_dataset = create_tensor_dataset("train_drop_0.85", tokenizer)
 dev_dataset = create_tensor_dataset("dev_drop_0.85", tokenizer)
 train_dataloader = DataLoader(
@@ -55,7 +55,7 @@ model = BertForSequenceClassification.from_pretrained(
 # data parallel
 model = nn.DataParallel(model, device_ids=[0, 1])
 
-# # Tell pytorch to run this model on the GPU.
+# Tell pytorch to run this model on the GPU.
 desc = model.cuda()
 
 logging.info(f"GPU memory info:\n{check_gpu_mem()}")
@@ -150,7 +150,7 @@ for epoch_i in range(0, epochs):
         if step < 2:
             print('\n  Step {:} GPU Memory Use:'.format(step))
             df = check_gpu_mem()
-            print('    Before forward-pass: {:}'.format(df.iloc[0, 1]))
+            print('    Before forward-pass: {:}'.format(df.iloc[0, 1, 2]))
 
         # Always clear any previously calculated gradients before performing a
         # backward pass. PyTorch doesn't do this automatically because
@@ -179,7 +179,7 @@ for epoch_i in range(0, epochs):
         # Report GPU memory use for the first couple steps.
         if step < 2:
             df = check_gpu_mem()
-            print('     After forward-pass: {:}'.format(df.iloc[0, 1]))
+            print('     After forward-pass: {:}'.format(df.iloc[0, 1, 2]))
 
         # Accumulate the training loss over all of the batches so that we can
         # calculate the average loss at the end. `loss` is a Tensor containing a
@@ -193,7 +193,7 @@ for epoch_i in range(0, epochs):
         # Report GPU memory use for the first couple steps.
         if step < 2:
             df = check_gpu_mem()
-            print('    After gradient calculation: {:}'.format(df.iloc[0, 1]))
+            print('    After gradient calculation: {:}'.format(df.iloc[0, 1, 2]))
 
         # Clip the norm of the gradients to 1.0.
         # This is to help prevent the "exploding gradients" problem.
@@ -262,10 +262,14 @@ for epoch_i in range(0, epochs):
             # https://huggingface.co/transformers/v2.2.0/model_doc/bert.html#transformers.BertForSequenceClassification
             # Get the "logits" output by the model. The "logits" are the output
             # values prior to applying an activation function like the softmax.
-            (loss, logits) = model(b_input_ids,
-                                   token_type_ids=None,
-                                   attention_mask=b_input_mask,
-                                   labels=b_labels)
+            result = model(b_input_ids,
+                           token_type_ids=None,
+                           attention_mask=b_input_mask,
+                           labels=b_labels,
+                           return_dict=True)
+
+            loss = result.loss
+            logits = result.logits
 
         # Accumulate the validation loss.
         total_eval_loss += loss.item()
