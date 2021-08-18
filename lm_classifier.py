@@ -8,6 +8,7 @@ from transformers import BertTokenizer, BertForSequenceClassification, AdamW, Be
 from transformers import get_linear_schedule_with_warmup
 import random
 import time
+import torch.nn as nn
 
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
@@ -28,7 +29,7 @@ else:
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
 
 # load data into dataloader
-batch_size = 2
+batch_size = 16
 train_dataset = create_tensor_dataset("train_drop_0.85", tokenizer)
 dev_dataset = create_tensor_dataset("dev_drop_0.85", tokenizer)
 train_dataloader = DataLoader(
@@ -51,8 +52,11 @@ model = BertForSequenceClassification.from_pretrained(
     output_hidden_states=False,  # Whether the model returns all hidden-states.
 )
 
-# Tell pytorch to run this model on the GPU.
-desc = model.cuda()
+# data parallel
+model = nn.DataParallel(model, device_ids=[0, 1])
+
+# # Tell pytorch to run this model on the GPU.
+# desc = model.cuda()
 
 logging.info(f"GPU memory info:\n{check_gpu_mem()}")
 
