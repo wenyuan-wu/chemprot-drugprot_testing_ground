@@ -53,10 +53,10 @@ model = BertForSequenceClassification.from_pretrained(
 )
 
 # data parallel
-model = nn.DataParallel(model, device_ids=[0, 1])
+# model = nn.DataParallel(model)
 
 # Tell pytorch to run this model on the GPU.
-desc = model.cuda()
+model.to(device)
 
 logging.info(f"GPU memory info:\n{check_gpu_mem()}")
 
@@ -150,7 +150,7 @@ for epoch_i in range(0, epochs):
         if step < 2:
             print('\n  Step {:} GPU Memory Use:'.format(step))
             df = check_gpu_mem()
-            print('    Before forward-pass: {:}'.format(df.iloc[0, 1, 2]))
+            print('    Before forward-pass: {:}'.format(df.iloc[0, 1]))
 
         # Always clear any previously calculated gradients before performing a
         # backward pass. PyTorch doesn't do this automatically because
@@ -179,7 +179,7 @@ for epoch_i in range(0, epochs):
         # Report GPU memory use for the first couple steps.
         if step < 2:
             df = check_gpu_mem()
-            print('     After forward-pass: {:}'.format(df.iloc[0, 1, 2]))
+            print('     After forward-pass: {:}'.format(df.iloc[0, 1]))
 
         # Accumulate the training loss over all of the batches so that we can
         # calculate the average loss at the end. `loss` is a Tensor containing a
@@ -193,7 +193,7 @@ for epoch_i in range(0, epochs):
         # Report GPU memory use for the first couple steps.
         if step < 2:
             df = check_gpu_mem()
-            print('    After gradient calculation: {:}'.format(df.iloc[0, 1, 2]))
+            print('    After gradient calculation: {:}'.format(df.iloc[0, 1]))
 
         # Clip the norm of the gradients to 1.0.
         # This is to help prevent the "exploding gradients" problem.
