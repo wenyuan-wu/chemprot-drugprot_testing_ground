@@ -11,7 +11,6 @@ import random
 import time
 import torch.nn as nn
 
-
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO,
                     # datefmt='%d-%b-%y %H:%M:%S'
@@ -32,7 +31,13 @@ tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=Tru
 # tiny dataset for testing
 logging.warning("using tiny dataset for testing...")
 train_dataset = create_tensor_dataset("train_tiny", tokenizer)
-dev_dataset = create_tensor_dataset("dev_tiny", tokenizer)
+
+# Calculate the number of samples to include in each set.
+train_size = int(0.9 * len(train_dataset))
+val_size = len(train_dataset) - train_size
+
+# Divide the dataset by randomly selecting samples.
+train_dataset, val_dataset = random_split(train_dataset, [train_size, val_size])
 
 # load data into dataloader
 # train_dataset = create_tensor_dataset("train_drop_0.85", tokenizer)
@@ -45,8 +50,8 @@ train_dataloader = DataLoader(
     batch_size=batch_size  # Trains with this batch size.
 )
 validation_dataloader = DataLoader(
-    dev_dataset,  # The validation samples.
-    sampler=SequentialSampler(dev_dataset),  # Pull out batches sequentially.
+    val_dataset,  # The validation samples.
+    sampler=SequentialSampler(val_dataset),  # Pull out batches sequentially.
     batch_size=batch_size  # Evaluate with this batch size.
 )
 
