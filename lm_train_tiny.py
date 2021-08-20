@@ -29,11 +29,8 @@ else:
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
 
 # tiny dataset for testing
-# logging.warning("using tiny dataset for testing...")
-# train_dataset = create_tensor_dataset("train_tiny", tokenizer)
-
-# load data into dataloader
-train_dataset = create_tensor_dataset("train_drop_0.85", tokenizer)
+logging.warning("using tiny dataset for testing...")
+train_dataset = create_tensor_dataset("train_tiny", tokenizer)
 
 # Calculate the number of samples to include in each set.
 train_size = int(0.9 * len(train_dataset))
@@ -42,8 +39,11 @@ val_size = len(train_dataset) - train_size
 # Divide the dataset by randomly selecting samples.
 train_dataset, val_dataset = random_split(train_dataset, [train_size, val_size])
 
-batch_size = 32
+# load data into dataloader
+# train_dataset = create_tensor_dataset("train_drop_0.85", tokenizer)
+# dev_dataset = create_tensor_dataset("dev_drop_0.85", tokenizer)
 
+batch_size = 8
 train_dataloader = DataLoader(
     train_dataset,  # The training samples.
     sampler=RandomSampler(train_dataset),  # Select batches randomly
@@ -323,6 +323,6 @@ print("Training complete!")
 # Create a DataFrame from our training statistics.
 df_stats = get_train_stats(training_stats)
 print(df_stats)
-model_name = "bert-base-uncased_ft_0.85"
+model_name = "bert_tiny"
 save_train_stats(df_stats, model_name)
 save_model(model_name, model, tokenizer)

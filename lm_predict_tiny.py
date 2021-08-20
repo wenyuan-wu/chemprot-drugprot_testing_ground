@@ -23,7 +23,7 @@ else:
     logging.info('No GPU available, using the CPU instead.')
     device = torch.device("cpu")
 
-model_name = "bert-base-uncased_ft_0.85"
+model_name = "bert_tiny"
 model_path = os.path.join("model", model_name)
 
 # load the BERT tokenizer and model
@@ -31,8 +31,8 @@ tokenizer = BertTokenizer.from_pretrained(model_path, local_files_only=True)
 model = BertForSequenceClassification.from_pretrained(model_path, local_files_only=True)
 model.to(device)
 
-batch_size = 32
-dev_dataset = create_tensor_dataset("dev_drop_0.85", tokenizer)
+batch_size = 8
+dev_dataset = create_tensor_dataset("dev_tiny", tokenizer)
 
 # Create a sequential sampler--no need to randomize the order!
 dev_sampler = SequentialSampler(dev_dataset)
@@ -42,7 +42,7 @@ dev_dataloader = DataLoader(dev_dataset, sampler=dev_sampler, batch_size=batch_s
 
 # Predict labels for all test set examples.
 
-print('Predicting labels for {:,} test(dev) sentences...'.format(len(dev_dataloader)))
+print('Predicting labels for {:,} test comments...'.format(len(dev_dataloader)))
 
 # Put model in evaluation mode
 model.eval()
