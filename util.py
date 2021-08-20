@@ -82,8 +82,9 @@ def create_tensor_dataset(data_name, tokenizer, max_length=192):
     data_df = load_from_bin(data_name)
     data_df = data_df.reset_index()
     data_df.rename(columns={'index': "sent_id"}, inplace=True)
-    data_df.relation = pd.Categorical(data_df.relation)
-    data_df["label"] = data_df.relation.cat.codes
+    # TODO: fix cat issues
+    # data_df.relation = pd.Categorical(data_df.relation)
+    # data_df["label"] = data_df.relation.cat.codes
 
     # Get the lists of sentences and their labels.
     sentences = data_df.text_raw.values

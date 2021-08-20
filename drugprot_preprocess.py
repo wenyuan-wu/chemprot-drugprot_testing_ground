@@ -66,6 +66,7 @@ def check_sub_range(range_1, range_2):
 
 
 def remove_tag():
+    # TODO: remove tag in test set
     raise NotImplementedError
 
 
@@ -144,7 +145,7 @@ def create_data_dict(abs_df, ent_df, rel_df, annotation="None"):
                                           "rel_dict": {},
                                           "relation": "NONE"
                                           }
-
+    # TODO:
     # TODO: some annotation could happen here
     if annotation == "anoy":
         pass

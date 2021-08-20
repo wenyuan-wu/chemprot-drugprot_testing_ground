@@ -70,7 +70,7 @@ model = BertForSequenceClassification.from_pretrained(
 # Tell pytorch to run this model on the GPU.
 model.to(device)
 
-logging.info(f"GPU memory info:\n{check_gpu_mem()}")
+# logging.info(f"GPU memory info:\n{check_gpu_mem()}")
 
 # Note: AdamW is a class from the huggingface library (as opposed to pytorch)
 # I believe the 'W' stands for 'Weight Decay fix"
@@ -80,7 +80,7 @@ optimizer = AdamW(model.parameters(),
                   )
 
 # Number of training epochs (authors recommend between 2 and 4)
-epochs = 4
+epochs = 2
 # Total number of training steps is number of batches * number of epochs.
 total_steps = len(train_dataloader) * epochs
 # Create the learning rate scheduler.
@@ -159,10 +159,11 @@ for epoch_i in range(0, epochs):
         b_labels = batch[2].to(device)
 
         # Check GPU memory for the first couple steps.
-        if step < 2:
-            print('\n  Step {:} GPU Memory Use:'.format(step))
-            df = check_gpu_mem()
-            print('    Before forward-pass: {:}'.format(df.iloc[0, 1]))
+        # macos doesn't have a GPU!
+        # if step < 2:
+        #     print('\n  Step {:} GPU Memory Use:'.format(step))
+        #     df = check_gpu_mem()
+        #     print('    Before forward-pass: {:}'.format(df.iloc[0, 1]))
 
         # Always clear any previously calculated gradients before performing a
         # backward pass. PyTorch doesn't do this automatically because
@@ -189,9 +190,9 @@ for epoch_i in range(0, epochs):
         logits = result.logits
 
         # Report GPU memory use for the first couple steps.
-        if step < 2:
-            df = check_gpu_mem()
-            print('     After forward-pass: {:}'.format(df.iloc[0, 1]))
+        # if step < 2:
+        #     df = check_gpu_mem()
+        #     print('     After forward-pass: {:}'.format(df.iloc[0, 1]))
 
         # Accumulate the training loss over all of the batches so that we can
         # calculate the average loss at the end. `loss` is a Tensor containing a
@@ -203,9 +204,9 @@ for epoch_i in range(0, epochs):
         loss.backward()
 
         # Report GPU memory use for the first couple steps.
-        if step < 2:
-            df = check_gpu_mem()
-            print('    After gradient calculation: {:}'.format(df.iloc[0, 1]))
+        # if step < 2:
+        #     df = check_gpu_mem()
+        #     print('    After gradient calculation: {:}'.format(df.iloc[0, 1]))
 
         # Clip the norm of the gradients to 1.0.
         # This is to help prevent the "exploding gradients" problem.

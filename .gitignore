@@ -3,6 +3,7 @@ venv/
 __pycache__/
 .ipynb_checkpoints/
 cola_public/
+.DS_Store
 
 # data
 data/*
