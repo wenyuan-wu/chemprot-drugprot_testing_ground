@@ -9,6 +9,8 @@ from torch.utils.data import TensorDataset, random_split
 import os
 import csv
 import datetime
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO,
@@ -35,7 +37,8 @@ def load_from_bin(file_name):
     return tmp_dict
 
 
-def sent_len_dist(sents, tokenizer):
+def sent_len_dist(sents, tokenizer, max_length=192):
+    logging.info(f"max length: {max_length}")
     # Tokenize all of the sentences and map the tokens to thier word IDs.
     input_ids = []
     # Record the length of each sequence (in terms of BERT tokens).
@@ -67,14 +70,15 @@ def sent_len_dist(sents, tokenizer):
 
     num_over = 0
     for length in lengths:
-        # Tally if it's over 512.
-        if length > 512:
+        # Tally if it's over 192.
+        if length > max_length:
             num_over += 1
     logging.info('{:,} of {:,} sentences will be truncated ({:.2%})'
                  .format(num_over, len(lengths), float(num_over) / float(len(lengths))))
 
 
-def create_tensor_dataset(data_name, tokenizer):
+def create_tensor_dataset(data_name, tokenizer, max_length=192):
+    logging.info(f"max length: {max_length}")
     data_df = load_from_bin(data_name)
     data_df = data_df.reset_index()
     data_df.rename(columns={'index': "sent_id"}, inplace=True)
@@ -104,7 +108,7 @@ def create_tensor_dataset(data_name, tokenizer):
         encoded_dict = tokenizer.encode_plus(
             sent,  # Sentence to encode.
             add_special_tokens=True,  # Add '[CLS]' and '[SEP]'
-            max_length=512,  # Pad & truncate all sentences.
+            max_length=max_length,  # Pad & truncate all sentences.
             padding='max_length',
             truncation=True,
             return_attention_mask=True,  # Construct attn. masks.
@@ -161,51 +165,64 @@ def format_time(elapsed):
     return str(datetime.timedelta(seconds=elapsed_rounded))
 
 
-# class CustomTextDataset(Dataset):
-#     def __init__(self, dataframe):
-#         self.labels = dataframe.relation
-#         self.text = dataframe.text_raw
-#
-#     def __len__(self):
-#         return len(self.labels)
-#
-#     def __getitem__(self, idx):
-#         label = self.labels[idx]
-#         text = self.text[idx]
-#         sample = {"Text": text, "Class": label}
-#         return sample
-#
-#
-# TD = CustomTextDataset(df_train)
-# print('\nFirst iteration of data set: ', next(iter(TD)), '\n')
-#
-#
-# # Print entire data set
-# # print('Entire data set: ', list(DataLoader(TD)), '\n')
-# DL = torch.utils.data.DataLoader(TD, batch_size=256, shuffle = True)
-# for (idx, batch) in enumerate(DL):
-#     print(batch['Text'])
-#     print(batch['Class'])
-#
-#
-# def collate_batch(batch):
-#     text_tensor = BertTokenizer.encode()
-#     word_tensor = torch.tensor([[1.], [0.], [45.]])
-#     label_tensor = torch.tensor([[1.]])
-#
-#     text_list, classes = [], []
-#     for (_text, _class) in batch:
-#         encoded_dict = tokenizer.encode_plus(
-#             _text,  # Sentence to encode.
-#             add_special_tokens=True,  # Add '[CLS]' and '[SEP]'
-#             max_length=64,  # Pad & truncate all sentences.
-#             pad_to_max_length=True,
-#             return_attention_mask=True,  # Construct attn. masks.
-#             return_tensors='pt',  # Return pytorch tensors.
-#         )
-#
-#         text_list.append(word_tensor)
-#         classes.append(label_tensor)
-#     text = torch.cat(text_list)
-#     classes = torch.tensor(classes)
-#     return text, classes
+def get_train_stats(train_stats):
+    # Create a DataFrame from our training statistics.
+    df_stats = pd.DataFrame(data=train_stats)
+
+    # Use the 'epoch' as the row index.
+    df_stats = df_stats.set_index('epoch')
+
+    # A hack to force the column headers to wrap.
+    # df = df.style.set_table_styles([dict(selector="th",props=[('max-width', '50px')])])
+
+    # Display floats with two decimal places.
+    pd.set_option('precision', 2)
+
+    # Display the table.
+    return df_stats
+
+
+def save_train_stats(df_stats, model_name):
+    # Use plot styling from seaborn.
+    sns.set(style='darkgrid')
+
+    # Increase the plot size and font size.
+    sns.set(font_scale=1.5)
+    plt.rcParams["figure.figsize"] = (12, 6)
+
+    # Plot the learning curve.
+    plt.plot(df_stats['Training Loss'], 'b-o', label="Training")
+    plt.plot(df_stats['Valid. Loss'], 'g-o', label="Validation")
+
+    # Label the plot.
+    plt.title("Training & Validation loss")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.legend()
+    plt.xticks([1, 2, 3, 4])
+
+    output_dir = join("model", model_name)
+    # Create output directory if needed
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    file_name = f"train_stat_{datetime.datetime.now()}.png"
+    output_path = join(output_dir, file_name)
+    plt.savefig(output_path)
+
+
+def save_model(model_name, model, tokenizer):
+    output_dir = join("model", model_name)
+    # Create output directory if needed
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    print("Saving model to %s" % output_dir)
+
+    # Save a trained model, configuration and tokenizer using `save_pretrained()`.
+    # They can then be reloaded using `from_pretrained()`
+    model_to_save = model.module if hasattr(model, 'module') else model  # Take care of distributed/parallel training
+    model_to_save.save_pretrained(output_dir)
+    tokenizer.save_pretrained(output_dir)
+
+    # Good practice: save your training arguments together with the trained model
+    # torch.save(args, os.path.join(output_dir, 'training_args.bin'))

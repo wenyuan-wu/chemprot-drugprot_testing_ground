@@ -9,3 +9,6 @@ data/*
 
 # not to ignore
 !data/data_download.sh
+
+# saved model
+model

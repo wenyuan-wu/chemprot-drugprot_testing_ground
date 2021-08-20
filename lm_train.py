@@ -3,7 +3,8 @@ import logging
 import pandas as pd
 import numpy as np
 from util import create_tensor_dataset, check_gpu_mem, flat_accuracy, format_time
-from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
+from util import get_train_stats, save_train_stats, save_model
+from torch.utils.data import DataLoader, RandomSampler, SequentialSampler, random_split
 from transformers import BertTokenizer, BertForSequenceClassification, AdamW, BertConfig
 from transformers import get_linear_schedule_with_warmup
 import random
@@ -28,10 +29,16 @@ else:
 # load the BERT tokenizer.
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
 
+# tiny dataset for testing
+logging.warning("using tiny dataset for testing...")
+train_dataset = create_tensor_dataset("train_tiny", tokenizer)
+dev_dataset = create_tensor_dataset("dev_tiny", tokenizer)
+
 # load data into dataloader
+# train_dataset = create_tensor_dataset("train_drop_0.85", tokenizer)
+# dev_dataset = create_tensor_dataset("dev_drop_0.85", tokenizer)
+
 batch_size = 8
-train_dataset = create_tensor_dataset("train_drop_0.85", tokenizer)
-dev_dataset = create_tensor_dataset("dev_drop_0.85", tokenizer)
 train_dataloader = DataLoader(
     train_dataset,  # The training samples.
     sampler=RandomSampler(train_dataset),  # Select batches randomly
@@ -53,7 +60,7 @@ model = BertForSequenceClassification.from_pretrained(
 )
 
 # data parallel
-# model = nn.DataParallel(model)
+# model = nn.DataParallel(model, device_ids=[0, 1])
 
 # Tell pytorch to run this model on the GPU.
 model.to(device)
@@ -308,3 +315,9 @@ for epoch_i in range(0, epochs):
 print("")
 print("Training complete!")
 
+# Create a DataFrame from our training statistics.
+df_stats = get_train_stats(training_stats)
+print(df_stats)
+model_name = "bert_tiny"
+save_train_stats(df_stats, model_name)
+save_model(model_name, model, tokenizer)
