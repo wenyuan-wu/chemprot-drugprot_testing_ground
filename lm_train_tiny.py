@@ -59,7 +59,7 @@ validation_dataloader = DataLoader(
 # linear classification layer on top.
 model = BertForSequenceClassification.from_pretrained(
     "bert-base-uncased",  # Use the 12-layer BERT model, with an uncased vocab.
-    num_labels=14,  # 14 labels
+    num_labels=13,  # 13 labels, NONE dropped
     output_attentions=False,  # Whether the model returns attentions weights.
     output_hidden_states=False,  # Whether the model returns all hidden-states.
 )
@@ -80,7 +80,7 @@ optimizer = AdamW(model.parameters(),
                   )
 
 # Number of training epochs (authors recommend between 2 and 4)
-epochs = 2
+epochs = 4
 # Total number of training steps is number of batches * number of epochs.
 total_steps = len(train_dataloader) * epochs
 # Create the learning rate scheduler.
