@@ -158,20 +158,20 @@ def main():
     abs_df, ent_df, rel_df = get_df_from_data(data_set)
     data_dict_train = create_data_dict(abs_df, ent_df, rel_df)
     # pprint.pprint(data_dict_train)
-    save_to_bin(data_dict_train, "train")
+    save_to_bin(data_dict_train, "train_org")
     # for debug purpose
     # pprint.pprint(data_dict_train)
 
     data_set = "development"
     abs_df, ent_df, rel_df = get_df_from_data(data_set)
     data_dict_dev = create_data_dict(abs_df, ent_df, rel_df)
-    save_to_bin(data_dict_dev, "dev")
+    save_to_bin(data_dict_dev, "dev_org")
 
     abs_df, ent_df = get_df_from_data_test()
     column_names = ["a", "b", "c"]
     rel_df = pd.DataFrame(columns=column_names)
     data_dict_test = create_data_dict(abs_df, ent_df, rel_df)
-    save_to_bin(data_dict_test, "test")
+    save_to_bin(data_dict_test, "test_org")
 
 
 if __name__ == '__main__':

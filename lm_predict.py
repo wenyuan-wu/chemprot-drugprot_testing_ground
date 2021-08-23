@@ -15,7 +15,7 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     )
 
 if torch.cuda.is_available():
-    device = torch.device("cuda")
+    device = torch.device("cuda:1")
     logging.info(f'There are {torch.cuda.device_count()} GPU(s) available.')
     logging.info(f'Use the GPU: {torch.cuda.get_device_name(0)}')
 
@@ -23,7 +23,7 @@ else:
     logging.info('No GPU available, using the CPU instead.')
     device = torch.device("cpu")
 
-model_name = "bert-base-uncased_ft_0.85"
+model_name = "bert-base-uncased_ft"
 model_path = os.path.join("model", model_name)
 
 # load the BERT tokenizer and model
@@ -32,7 +32,7 @@ model = BertForSequenceClassification.from_pretrained(model_path, local_files_on
 model.to(device)
 
 batch_size = 32
-dev_dataset = create_tensor_dataset("dev_drop_0.85", tokenizer)
+dev_dataset = create_tensor_dataset("dev", tokenizer)
 
 # Create a sequential sampler--no need to randomize the order!
 dev_sampler = SequentialSampler(dev_dataset)
@@ -42,7 +42,7 @@ dev_dataloader = DataLoader(dev_dataset, sampler=dev_sampler, batch_size=batch_s
 
 # Predict labels for all test set examples.
 
-print('Predicting labels for {:,} test(dev) sentences...'.format(len(dev_dataloader)))
+# print('Predicting labels for {:,} test(dev) sentences...'.format(len(dev_dataloader)))
 
 # Put model in evaluation mode
 model.eval()

@@ -4,7 +4,7 @@ from transformers import BertTokenizer, BertForSequenceClassification, AdamW, Be
 from transformers import get_linear_schedule_with_warmup
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler, random_split
 import os
-from util import create_tensor_dataset, format_time, load_from_bin
+from util import create_tensor_dataset, format_time, load_from_bin, save_to_bin
 import time
 import numpy as np
 from sklearn import metrics
@@ -112,12 +112,14 @@ score = metrics.f1_score(true_labels, predicted_labels, average='macro')
 print('F1 score: {:.3}'.format(score))
 
 df_test = load_from_bin("test_tiny")
-print(df_test)
-df_test["class"] = predicted_labels
-print(df_test)
-label_dict = load_from_bin("train_drop_0.85_label_dict")
-print(label_dict)
-print("mapping...")
+# print(df_test)
+df_test["label"] = predicted_labels
+# print(df_test)
+idx_to_label_dict = load_from_bin("idx_to_label_dict")
+# print(idx_to_label_dict)
+logging.info("mapping...")
 # df_test["label_code"] = df_test["class"].cat.codes
-df_test["label"] = df_test["class"].map(label_dict)
-print(df_test)
+df_test["relation"] = df_test["label"].map(idx_to_label_dict)
+# print(df_test)
+save_to_bin(df_test, "test_tiny_pred")
+
