@@ -133,7 +133,8 @@ def create_data_dict(abs_df, ent_df, rel_df, annotation="None"):
                                           "ent_dict": ent_dict,
                                           "rel_count": rel_count,
                                           "rel_dict": v,
-                                          "relation": v["Relation"]
+                                          "relation": v["Relation"],
+                                          "pmid": pmid,
                                           }
                     rel_count += 1
                 else:
@@ -143,7 +144,8 @@ def create_data_dict(abs_df, ent_df, rel_df, annotation="None"):
                                           "ent_dict": ent_dict,
                                           "rel_count": rel_count,
                                           "rel_dict": {},
-                                          "relation": "NONE"
+                                          "relation": "NONE",
+                                          "pmid": pmid,
                                           }
     # TODO:
     # TODO: some annotation could happen here

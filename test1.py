@@ -24,7 +24,10 @@ pmid = 17380207
 # print(dev_df.iloc[dev_df.index.startswith(pmid)])
 # pprint(dev_dict[pmid])
 
-
+for k, v in dev_dict.items():
+    if v["pmid"] == pmid:
+        print(f"key: {k}")
+        pprint(v)
 
 
 # print(dev_df)
