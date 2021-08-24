@@ -17,7 +17,7 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     )
 
 if torch.cuda.is_available():
-    device = torch.device("cuda:1")
+    device = torch.device("cuda")
     logging.info(f'There are {torch.cuda.device_count()} GPU(s) available.')
     logging.info(f'Use the GPU: {torch.cuda.get_device_name(0)}')
 
