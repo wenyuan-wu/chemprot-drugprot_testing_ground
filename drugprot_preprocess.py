@@ -70,7 +70,7 @@ def remove_tag():
     raise NotImplementedError
 
 
-def create_data_dict(abs_df, ent_df, rel_df, annotation="None"):
+def create_data_dict(abs_df, ent_df, rel_df):
     nlp = English()
     nlp.add_pipe("sentencizer")
     pmids = abs_df.index.values.tolist()  # training set pmids: 3500
@@ -78,6 +78,7 @@ def create_data_dict(abs_df, ent_df, rel_df, annotation="None"):
 
     data_dict = {}
     for pmid in tqdm(pmids):
+        pmid = 17380207
         complete = " ".join([abs_df.at[pmid, "Title"], abs_df.at[pmid, "Abstract"]])
 
         offset_to_ent_dict = {}
@@ -147,33 +148,36 @@ def create_data_dict(abs_df, ent_df, rel_df, annotation="None"):
                                           "relation": "NONE",
                                           "pmid": pmid,
                                           }
-    # TODO:
-    # TODO: some annotation could happen here
-    if annotation == "anoy":
-        pass
+            # TODO:
+            # TODO: some annotation could happen here
+
+        break
+
+    for k, v in data_dict.items():
+        print(k, v)
 
     return data_dict
 
 
 def main():
-    data_set = "training"
-    abs_df, ent_df, rel_df = get_df_from_data(data_set)
-    data_dict_train = create_data_dict(abs_df, ent_df, rel_df)
-    # pprint.pprint(data_dict_train)
-    save_to_bin(data_dict_train, "train_org")
-    # for debug purpose
-    # pprint.pprint(data_dict_train)
+    # data_set = "training"
+    # abs_df, ent_df, rel_df = get_df_from_data(data_set)
+    # data_dict_train = create_data_dict(abs_df, ent_df, rel_df)
+    # # pprint.pprint(data_dict_train)
+    # save_to_bin(data_dict_train, "train_org")
+    # # for debug purpose
+    # # pprint.pprint(data_dict_train)
 
     data_set = "development"
     abs_df, ent_df, rel_df = get_df_from_data(data_set)
     data_dict_dev = create_data_dict(abs_df, ent_df, rel_df)
-    save_to_bin(data_dict_dev, "dev_org")
+    # save_to_bin(data_dict_dev, "dev_org")
 
-    abs_df, ent_df = get_df_from_data_test()
-    column_names = ["a", "b", "c"]
-    rel_df = pd.DataFrame(columns=column_names)
-    data_dict_test = create_data_dict(abs_df, ent_df, rel_df)
-    save_to_bin(data_dict_test, "test_org")
+    # abs_df, ent_df = get_df_from_data_test()
+    # column_names = ["a", "b", "c"]
+    # rel_df = pd.DataFrame(columns=column_names)
+    # data_dict_test = create_data_dict(abs_df, ent_df, rel_df)
+    # save_to_bin(data_dict_test, "test_org")
 
 
 if __name__ == '__main__':
