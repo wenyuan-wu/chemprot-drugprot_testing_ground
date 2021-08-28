@@ -4,7 +4,7 @@ import logging
 from tqdm import tqdm
 import pandas as pd
 from util import save_to_bin
-import pprint
+from pprint import pprint
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO,
@@ -78,7 +78,7 @@ def create_data_dict(abs_df, ent_df, rel_df):
 
     data_dict = {}
     for pmid in tqdm(pmids):
-        pmid = 17380207
+        # pmid = 17380207
         complete = " ".join([abs_df.at[pmid, "Title"], abs_df.at[pmid, "Abstract"]])
 
         offset_to_ent_dict = {}
@@ -114,7 +114,7 @@ def create_data_dict(abs_df, ent_df, rel_df):
             sent = sent.text + " "
             eoi = len(sent) + soi
             sent_range = range(soi, eoi)
-            soi = eoi
+
 
             # check entities
             ent_count = 0
@@ -129,6 +129,41 @@ def create_data_dict(abs_df, ent_df, rel_df):
             for k, v in rel_dict.items():
                 if k[0] in ent_dict.keys() and k[1] in ent_dict.keys():
                     sent_id = int(str(pmid) + str(idx) + str(rel_count))
+                    rel_count += 1
+
+                    # annotation: scibert style
+                    sent_list = []
+                    arg_1 = v["Arg1"][5:]
+                    arg_2 = v["Arg2"][5:]
+                    # update ent_dict to focus on the only two entities involved in the relation
+                    ent_dict = {arg_1: ent_dict[arg_1], arg_2: ent_dict[arg_2]}
+                    srt_list = sorted(ent_dict.items(), key=lambda x: x[1]["Start"], reverse=False)
+                    """
+                    idx_1: start of the first entity
+                    char_1: annotation for the start character of the first entity, depending on the type
+                    idx_2: end the first entity
+                    char_2: annotation for the end character of the first entity, depending on the type
+                    idx_3, char_3, idx_4, char_4: same deal to the second character
+                    """
+                    idx_1 = srt_list[0][1]["Start"] - soi
+                    char_1 = "<< " if srt_list[0][1]["Type"].startswith("CHEM") else "[[ "
+                    idx_2 = srt_list[0][1]["End"] - soi - 1
+                    char_2 = " >>" if srt_list[0][1]["Type"].startswith("CHEM") else " ]]"
+                    idx_3 = srt_list[1][1]["Start"] - soi
+                    char_3 = "<< " if srt_list[1][1]["Type"].startswith("CHEM") else "[[ "
+                    idx_4 = srt_list[1][1]["End"] - soi - 1
+                    char_4 = " >>" if srt_list[1][1]["Type"].startswith("CHEM") else " ]]"
+                    for idx, char in enumerate(list(sent)):
+                        if idx == idx_1:
+                            char = char_1 + char
+                        elif idx == idx_2:
+                            char = char + char_2
+                        elif idx == idx_3:
+                            char = char_3 + char
+                        elif idx == idx_4:
+                            char = char + char_4
+                        sent_list.append(char)
+                    result = "".join(sent_list)
                     data_dict[sent_id] = {"text_raw": sent,
                                           "ent_count": ent_count,
                                           "ent_dict": ent_dict,
@@ -136,42 +171,39 @@ def create_data_dict(abs_df, ent_df, rel_df):
                                           "rel_dict": v,
                                           "relation": v["Relation"],
                                           "pmid": pmid,
+                                          "text_scibert": result,
                                           }
-                    rel_count += 1
-                else:
-                    sent_id = int(str(pmid) + str(idx) + str(rel_count))
-                    data_dict[sent_id] = {"text_raw": sent,
-                                          "ent_count": ent_count,
-                                          "ent_dict": ent_dict,
-                                          "rel_count": rel_count,
-                                          "rel_dict": {},
-                                          "relation": "NONE",
-                                          "pmid": pmid,
-                                          }
-            # TODO:
-            # TODO: some annotation could happen here
 
-        break
+                # drop sentences without relation inside
+                # else:
+                #     sent_id = int(str(pmid) + str(idx) + str(rel_count))
+                #     data_dict[sent_id] = {"text_raw": sent,
+                #                           "ent_count": ent_count,
+                #                           "ent_dict": ent_dict,
+                #                           "rel_count": rel_count,
+                #                           "rel_dict": {},
+                #                           "relation": "NONE",
+                #                           "pmid": pmid,
+                #                           }
 
-    for k, v in data_dict.items():
-        print(k, v)
+            # update range
+            soi = eoi
 
     return data_dict
 
 
 def main():
-    # data_set = "training"
-    # abs_df, ent_df, rel_df = get_df_from_data(data_set)
-    # data_dict_train = create_data_dict(abs_df, ent_df, rel_df)
-    # # pprint.pprint(data_dict_train)
-    # save_to_bin(data_dict_train, "train_org")
-    # # for debug purpose
-    # # pprint.pprint(data_dict_train)
+    data_set = "training"
+    abs_df, ent_df, rel_df = get_df_from_data(data_set)
+    data_dict_train = create_data_dict(abs_df, ent_df, rel_df)
+    save_to_bin(data_dict_train, "train_org")
+    # for debug purpose
+    # pprint(data_dict_train)
 
     data_set = "development"
     abs_df, ent_df, rel_df = get_df_from_data(data_set)
     data_dict_dev = create_data_dict(abs_df, ent_df, rel_df)
-    # save_to_bin(data_dict_dev, "dev_org")
+    save_to_bin(data_dict_dev, "dev_org")
 
     # abs_df, ent_df = get_df_from_data_test()
     # column_names = ["a", "b", "c"]
