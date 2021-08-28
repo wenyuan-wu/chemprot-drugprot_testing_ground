@@ -33,7 +33,7 @@ tokenizer = BertTokenizer.from_pretrained('allenai/scibert_scivocab_uncased', do
 # train_dataset = create_tensor_dataset("train_tiny", tokenizer)
 
 # load data into dataloader
-train_dataset = create_tensor_dataset("train_sci", tokenizer)
+train_dataset = create_tensor_dataset("train_sci", tokenizer, annotation="scibert")
 
 # Calculate the number of samples to include in each set.
 train_size = int(0.9 * len(train_dataset))

@@ -77,7 +77,7 @@ def sent_len_dist(sents, tokenizer, max_length=192):
                  .format(num_over, len(lengths), float(num_over) / float(len(lengths))))
 
 
-def create_tensor_dataset(data_name, tokenizer, max_length=192):
+def create_tensor_dataset(data_name, tokenizer, max_length=192, annotation="raw"):
     logging.info(f"max length: {max_length}")
     data_df = load_from_bin(data_name)
     data_df = data_df.reset_index()
@@ -87,7 +87,10 @@ def create_tensor_dataset(data_name, tokenizer, max_length=192):
     # data_df["label"] = data_df.relation.cat.codes
 
     # Get the lists of sentences and their labels.
-    sentences = data_df.text_raw.values
+    if annotation == "raw":
+        sentences = data_df.text_raw.values
+    elif annotation == "scibert":
+        sentences = data_df.text_scibert.values
     labels = data_df.label.values
 
     # get sentence length distribution information

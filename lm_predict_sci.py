@@ -32,7 +32,7 @@ model = BertForSequenceClassification.from_pretrained(model_path, local_files_on
 model.to(device)
 
 batch_size = 32
-dev_dataset = create_tensor_dataset("dev_sci", tokenizer)
+dev_dataset = create_tensor_dataset("dev_sci", tokenizer, annotation="scibert")
 
 # Create a sequential sampler--no need to randomize the order!
 dev_sampler = SequentialSampler(dev_dataset)
