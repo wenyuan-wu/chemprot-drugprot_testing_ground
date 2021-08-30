@@ -91,6 +91,8 @@ def create_tensor_dataset(data_name, tokenizer, max_length=192, annotation="raw"
         sentences = data_df.text_raw.values
     elif annotation == "scibert":
         sentences = data_df.text_scibert.values
+    elif annotation == "biobert":
+        sentences = data_df.text_biobert.values
     labels = data_df.label.values
 
     # get sentence length distribution information

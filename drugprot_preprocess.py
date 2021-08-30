@@ -78,9 +78,9 @@ def create_data_dict(abs_df, ent_df, rel_df):
 
     data_dict = {}
     for pmid in tqdm(pmids):
+        # for debug purpose
         # pmid = 17380207
         complete = " ".join([abs_df.at[pmid, "Title"], abs_df.at[pmid, "Abstract"]])
-
         offset_to_ent_dict = {}
         try:
             for index, row in ent_df.loc[pmid].iterrows():
@@ -174,6 +174,42 @@ def create_data_dict(abs_df, ent_df, rel_df):
                                           "text_scibert": result,
                                           }
 
+                    # annotation: biobert style (anonymize)
+                    sent_list = []
+                    arg_1 = v["Arg1"][5:]
+                    arg_2 = v["Arg2"][5:]
+                    # update ent_dict to focus on the only two entities involved in the relation
+                    ent_dict = {arg_1: ent_dict[arg_1], arg_2: ent_dict[arg_2]}
+                    srt_list = sorted(ent_dict.items(), key=lambda x: x[1]["Start"], reverse=False)
+                    """
+                    idx_1: start of the first entity
+                    idx_2: end the first entity
+                    idx_range_1: index span of the first entity
+                    char_1: annotation of the first entity, depending on the type
+                    idx_3, idx_4, idx_range_2, char_2: same deal to the second character
+                    """
+                    idx_1 = srt_list[0][1]["Start"] - soi
+                    idx_2 = srt_list[0][1]["End"] - soi - 1
+                    char_1 = "$CHMICAL#" if srt_list[0][1]["Type"].startswith("CHEM") else "$GENE#"
+                    idx_range_1 = list(range(idx_1 + 1, idx_2 + 1))
+                    idx_3 = srt_list[1][1]["Start"] - soi
+                    idx_4 = srt_list[1][1]["End"] - soi - 1
+                    idx_range_2 = list(range(idx_3 + 1, idx_4 + 1))
+                    char_2 = "$CHMICAL#" if srt_list[1][1]["Type"].startswith("CHEM") else "$GENE#"
+                    for idx, char in enumerate(list(sent)):
+                        if idx == idx_1:
+                            char = char_1
+                        elif idx in idx_range_1:
+                            char = ""
+                        elif idx == idx_3:
+                            char = char_2
+                        elif idx in idx_range_2:
+                            char = ""
+                        sent_list.append(char)
+                    result = "".join(sent_list)
+                    data_dict[sent_id]["text_biobert"] = result
+
+
                 # drop sentences without relation inside
                 # else:
                 #     sent_id = int(str(pmid) + str(idx) + str(rel_count))
@@ -188,7 +224,9 @@ def create_data_dict(abs_df, ent_df, rel_df):
 
             # update range
             soi = eoi
-
+        # for debug purpose
+        # pprint(data_dict)
+        # break
     return data_dict
 
 
