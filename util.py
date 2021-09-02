@@ -232,3 +232,5 @@ def save_model(model_name, model, tokenizer):
 
     # Good practice: save your training arguments together with the trained model
     # torch.save(args, os.path.join(output_dir, 'training_args.bin'))
+
+def sent_annotation():

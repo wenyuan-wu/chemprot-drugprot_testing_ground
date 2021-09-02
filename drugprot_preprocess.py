@@ -135,15 +135,22 @@ def create_data_dict(abs_df, ent_df, rel_df):
             # print(chem_list)
 
             if gene_list and chem_list:
-
+                itr_count = 0
                 for gene in gene_list:
                     for chem in chem_list:
                         print(f"combination: {gene} + {chem}")
                         print(rel_dict)
                         if (chem['Entity #'], gene['Entity #']) in rel_dict.keys():
                             print(f"haha, {chem}, {gene}")
+                            sent_id = int(str(pmid) + str(idx) + str(itr_count))
+                            itr_count += 1
+                            # annotation
                         else:
+                            sent_id = int(str(pmid) + str(idx) + str(itr_count))
+                            itr_count += 1
                             print("SAD!!")
+                            # annotation
+
 
             # check relations
             rel_count = 0
