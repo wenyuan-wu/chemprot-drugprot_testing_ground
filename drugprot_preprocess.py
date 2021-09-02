@@ -79,7 +79,7 @@ def create_data_dict(abs_df, ent_df, rel_df):
     data_dict = {}
     for pmid in tqdm(pmids):
         # for debug purpose
-        # pmid = 17380207
+        pmid = 17380207
         complete = " ".join([abs_df.at[pmid, "Title"], abs_df.at[pmid, "Abstract"]])
         offset_to_ent_dict = {}
         try:
@@ -119,10 +119,31 @@ def create_data_dict(abs_df, ent_df, rel_df):
             # check entities
             ent_count = 0
             ent_dict = {}
+            gene_list = []
+            chem_list = []
             for key, val in offset_to_ent_dict.items():
-                if check_sub_range(sent_range, key):
+                if check_sub_range(sent_range, key) and val["Type"].startswith("GENE"):
+                    gene_list.append(val)
                     ent_dict[val["Entity #"]] = val
                     ent_count += 1
+                elif check_sub_range(sent_range, key) and val["Type"].startswith("CHEM"):
+                    chem_list.append(val)
+                    ent_dict[val["Entity #"]] = val
+                    ent_count += 1
+
+            # print(gene_list)
+            # print(chem_list)
+
+            if gene_list and chem_list:
+
+                for gene in gene_list:
+                    for chem in chem_list:
+                        print(f"combination: {gene} + {chem}")
+                        print(rel_dict)
+                        if (chem['Entity #'], gene['Entity #']) in rel_dict.keys():
+                            print(f"haha, {chem}, {gene}")
+                        else:
+                            print("SAD!!")
 
             # check relations
             rel_count = 0
@@ -225,16 +246,16 @@ def create_data_dict(abs_df, ent_df, rel_df):
             # update range
             soi = eoi
         # for debug purpose
-        # pprint(data_dict)
-        # break
+        pprint(data_dict)
+        break
     return data_dict
 
 
 def main():
-    data_set = "training"
-    abs_df, ent_df, rel_df = get_df_from_data(data_set)
-    data_dict_train = create_data_dict(abs_df, ent_df, rel_df)
-    save_to_bin(data_dict_train, "train_org")
+    # data_set = "training"
+    # abs_df, ent_df, rel_df = get_df_from_data(data_set)
+    # data_dict_train = create_data_dict(abs_df, ent_df, rel_df)
+    # save_to_bin(data_dict_train, "train_org")
     # for debug purpose
     # pprint(data_dict_train)
 
