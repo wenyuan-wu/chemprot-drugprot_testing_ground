@@ -33,7 +33,7 @@ tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=Tru
 # train_dataset = create_tensor_dataset("train_tiny", tokenizer)
 
 # load data into dataloader
-train_dataset = create_tensor_dataset("train", tokenizer)
+train_dataset = create_tensor_dataset("train_none", tokenizer)
 
 # Calculate the number of samples to include in each set.
 train_size = int(0.9 * len(train_dataset))
@@ -59,7 +59,7 @@ validation_dataloader = DataLoader(
 # linear classification layer on top.
 model = BertForSequenceClassification.from_pretrained(
     "bert-base-uncased",  # Use the 12-layer BERT model, with an uncased vocab.
-    num_labels=13,  # 13 labels, since NONE dropped
+    num_labels=14,  # 14 labels, (since NONE dropped), including NONE
     output_attentions=False,  # Whether the model returns attentions weights.
     output_hidden_states=False,  # Whether the model returns all hidden-states.
 )
@@ -323,6 +323,6 @@ print("Training complete!")
 # Create a DataFrame from our training statistics.
 df_stats = get_train_stats(training_stats)
 print(df_stats)
-model_name = "bert-base-uncased_ft"
+model_name = "bert-base-uncased_ft_none"
 save_train_stats(df_stats, model_name)
 save_model(model_name, model, tokenizer)

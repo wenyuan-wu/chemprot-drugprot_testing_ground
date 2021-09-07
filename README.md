@@ -194,3 +194,17 @@ Model file of scibert_scivocab_uncased:
 ```
 wget "https://s3-us-west-2.amazonaws.com/ai2-s2-research/scibert/pytorch_models/scibert_scivocab_uncased.tar"
 ```
+
+# info
+## dist info
+- train
+- pos: 16956
+- neg: 48261
+
+- dev:
+- pos: 3712
+- neg: 9690
+
+- test:
+- pos: 0
+- neg: 220315

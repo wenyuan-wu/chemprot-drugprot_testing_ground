@@ -233,4 +233,66 @@ def save_model(model_name, model, tokenizer):
     # Good practice: save your training arguments together with the trained model
     # torch.save(args, os.path.join(output_dir, 'training_args.bin'))
 
-def sent_annotation():
+
+def sent_annotation(gene, chem, sent, soi, annotation):
+    sent_list = []
+    # update ent_dict to focus on the only two entities involved in the relation
+    ent_dict = {gene["Entity #"]: gene, chem["Entity #"]: chem}
+    srt_list = sorted(ent_dict.items(), key=lambda x: x[1]["Start"], reverse=False)
+
+    if annotation == "scibert":
+        """
+        idx_1: start of the first entity
+        char_1: annotation for the start character of the first entity, depending on the type
+        idx_2: end the first entity
+        char_2: annotation for the end character of the first entity, depending on the type
+        idx_3, char_3, idx_4, char_4: same deal to the second character
+        """
+        idx_1 = srt_list[0][1]["Start"] - soi
+        char_1 = "<< " if srt_list[0][1]["Type"].startswith("CHEM") else "[[ "
+        idx_2 = srt_list[0][1]["End"] - soi - 1
+        char_2 = " >>" if srt_list[0][1]["Type"].startswith("CHEM") else " ]]"
+        idx_3 = srt_list[1][1]["Start"] - soi
+        char_3 = "<< " if srt_list[1][1]["Type"].startswith("CHEM") else "[[ "
+        idx_4 = srt_list[1][1]["End"] - soi - 1
+        char_4 = " >>" if srt_list[1][1]["Type"].startswith("CHEM") else " ]]"
+        for idx, char in enumerate(list(sent)):
+            if idx == idx_1:
+                char = char_1 + char
+            elif idx == idx_2:
+                char = char + char_2
+            elif idx == idx_3:
+                char = char_3 + char
+            elif idx == idx_4:
+                char = char + char_4
+            sent_list.append(char)
+
+        return "".join(sent_list)
+
+    elif annotation == "biobert":
+        """
+        idx_1: start of the first entity
+        idx_2: end the first entity
+        idx_range_1: index span of the first entity
+        char_1: annotation of the first entity, depending on the type
+        idx_3, idx_4, idx_range_2, char_2: same deal to the second character
+        """
+        idx_1 = srt_list[0][1]["Start"] - soi
+        idx_2 = srt_list[0][1]["End"] - soi - 1
+        char_1 = "$CHEMICAL#" if srt_list[0][1]["Type"].startswith("CHEM") else "$GENE#"
+        idx_range_1 = list(range(idx_1 + 1, idx_2 + 1))
+        idx_3 = srt_list[1][1]["Start"] - soi
+        idx_4 = srt_list[1][1]["End"] - soi - 1
+        idx_range_2 = list(range(idx_3 + 1, idx_4 + 1))
+        char_2 = "$CHEMICAL#" if srt_list[1][1]["Type"].startswith("CHEM") else "$GENE#"
+        for idx, char in enumerate(list(sent)):
+            if idx == idx_1:
+                char = char_1
+            elif idx in idx_range_1:
+                char = ""
+            elif idx == idx_3:
+                char = char_2
+            elif idx in idx_range_2:
+                char = ""
+            sent_list.append(char)
+        return "".join(sent_list)

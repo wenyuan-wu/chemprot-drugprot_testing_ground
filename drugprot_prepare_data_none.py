@@ -41,10 +41,10 @@ plt.ylabel('# of Training Samples')
 # plt.show()
 
 # randomly drop 85% of NONE labels
-df_train = df_train.drop(df_train[df_train["relation"] == "NONE"].sample(frac=.85, random_state=1024).index)
-print(df_train["relation"].value_counts())
+# df_train = df_train.drop(df_train[df_train["relation"] == "NONE"].sample(frac=.85, random_state=1024).index)
+# print(df_train["relation"].value_counts())
 
-save_to_bin(df_train, "train_drop_0.85")
+save_to_bin(df_train, "train_none")
 df_train_tiny = df_train.drop(df_train.sample(frac=.999, random_state=1024).index)
 save_to_bin(df_train_tiny, "train_tiny_none")
 
@@ -72,9 +72,9 @@ plt.ylabel('# of Training Samples')
 # plt.show()
 
 # randomly drop 85% of NONE labels
-df_dev = df_dev.drop(df_dev[df_dev["relation"] == "NONE"].sample(frac=.85, random_state=1024).index)
+# df_dev = df_dev.drop(df_dev[df_dev["relation"] == "NONE"].sample(frac=.85, random_state=1024).index)
 print(df_dev["relation"].value_counts())
-save_to_bin(df_dev, "dev_drop_0.85")
+save_to_bin(df_dev, "dev_none")
 df_dev_tiny = df_dev.drop(df_dev.sample(frac=.999, random_state=1024).index)
 save_to_bin(df_dev_tiny, "dev_tiny_none")
 
@@ -89,9 +89,9 @@ print(df_test.loc[df_test.relation == "NONE"].sample(5))
 print(df_test["relation"].value_counts())
 
 # randomly drop 85% of NONE labels
-df_test = df_test.drop(df_test[df_test["relation"] == "NONE"].sample(frac=.85, random_state=1024).index)
-print(df_test["relation"].value_counts())
-save_to_bin(df_test, "test_drop_0.85")
+# df_test = df_test.drop(df_test[df_test["relation"] == "NONE"].sample(frac=.85, random_state=1024).index)
+# print(df_test["relation"].value_counts())
+save_to_bin(df_test, "test_none")
 
-df_test_tiny = df_test.drop(df_test.sample(frac=.99, random_state=1024).index)
+df_test_tiny = df_test.drop(df_test.sample(frac=.999, random_state=1024).index)
 save_to_bin(df_test_tiny, "test_tiny_none")

@@ -23,7 +23,7 @@ else:
     logging.info('No GPU available, using the CPU instead.')
     device = torch.device("cpu")
 
-model_name = "bert-base-uncased_ft"
+model_name = "bert-base-uncased_ft_none"
 model_path = os.path.join("model", model_name)
 
 # load the BERT tokenizer and model
@@ -32,7 +32,7 @@ model = BertForSequenceClassification.from_pretrained(model_path, local_files_on
 model.to(device)
 
 batch_size = 32
-dev_dataset = create_tensor_dataset("dev", tokenizer)
+dev_dataset = create_tensor_dataset("dev_none", tokenizer)
 
 # Create a sequential sampler--no need to randomize the order!
 dev_sampler = SequentialSampler(dev_dataset)

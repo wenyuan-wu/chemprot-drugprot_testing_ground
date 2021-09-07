@@ -23,7 +23,7 @@ else:
     logging.info('No GPU available, using the CPU instead.')
     device = torch.device("cpu")
 
-model_name = "biobert_base_v1.1_ft"
+model_name = "biobert_base_v1.1_ft_none"
 model_path = os.path.join("model", model_name)
 
 # load the BERT tokenizer and model

@@ -59,7 +59,7 @@ validation_dataloader = DataLoader(
 # linear classification layer on top.
 model = BertForSequenceClassification.from_pretrained(
     "dmis-lab/biobert-base-cased-v1.1",  # Use the 12-layer BERT model, with an uncased vocab.
-    num_labels=13,  # 13 labels, since NONE dropped
+    num_labels=14,  # 14 labels
     output_attentions=False,  # Whether the model returns attentions weights.
     output_hidden_states=False,  # Whether the model returns all hidden-states.
 )
@@ -323,6 +323,6 @@ print("Training complete!")
 # Create a DataFrame from our training statistics.
 df_stats = get_train_stats(training_stats)
 print(df_stats)
-model_name = "biobert_base_v1.1_ft"
+model_name = "biobert_base_v1.1_ft_none"
 save_train_stats(df_stats, model_name)
 save_model(model_name, model, tokenizer)

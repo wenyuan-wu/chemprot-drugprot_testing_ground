@@ -12,7 +12,7 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
 df_train = pd.DataFrame.from_dict(load_from_bin("train_org"), orient="index")
 df_train = df_train[['text_biobert', 'relation']]
 # drop none labels
-df_train = df_train.drop(df_train[df_train["relation"] == "NONE"].index)
+# df_train = df_train.drop(df_train[df_train["relation"] == "NONE"].index)
 df_train.relation = pd.Categorical(df_train.relation)
 df_train["label"] = df_train.relation.cat.codes
 idx_to_label_dict = dict(enumerate(df_train['relation'].cat.categories))
@@ -48,7 +48,7 @@ save_to_bin(df_train_tiny, "train_tiny_bio")
 logging.info("development set")
 df_dev = pd.DataFrame.from_dict(load_from_bin("dev_org"), orient="index")
 df_dev = df_dev[['text_biobert', 'relation']]
-df_dev = df_dev.drop(df_dev[df_dev["relation"] == "NONE"].index)
+# df_dev = df_dev.drop(df_dev[df_dev["relation"] == "NONE"].index)
 df_dev["label"] = df_dev["relation"].map(label_to_idx_dict)
 
 print(df_dev.sample(10, random_state=1024).to_string())
