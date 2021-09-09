@@ -153,7 +153,6 @@ def create_data_dict(abs_df, ent_df, rel_df):
                                                   "pmid": pmid,
                                                   "text_scibert": sent_sci,
                                                   "text_biobert": sent_bio,
-
                                                   }
 
                         else:
@@ -175,6 +174,7 @@ def create_data_dict(abs_df, ent_df, rel_df):
                                                   }
             # update range
             soi = eoi
+
         # for debug purpose
         # pprint(data_dict)
         # break

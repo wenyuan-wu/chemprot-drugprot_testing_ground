@@ -208,3 +208,8 @@ wget "https://s3-us-west-2.amazonaws.com/ai2-s2-research/scibert/pytorch_models/
 - test:
 - pos: 0
 - neg: 220315
+
+## LM Results
+| Base Language Model | Annotation Style | Negative Samples in Training Set | F1 Score on Development Set |
+| --- | --- | --- | --- |
+| 
