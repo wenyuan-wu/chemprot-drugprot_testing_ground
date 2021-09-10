@@ -197,19 +197,52 @@ wget "https://s3-us-west-2.amazonaws.com/ai2-s2-research/scibert/pytorch_models/
 
 # info
 ## dist info
-- train
-- pos: 16956
-- neg: 48261
+| Set | PMID | Pos | Neg |
+| --- | --- | --- | --- |
+| train | 3500 | 16956 | 48621 |
+| dev | 750 | 3712 | 9690 |
+| test | 10750 | 0 | 220315 |
 
-- dev:
-- pos: 3712
-- neg: 9690
+```
+NONE                      48197
+INHIBITOR                  5326
+DIRECT-REGULATOR           2153
+SUBSTRATE                  1988
+ACTIVATOR                  1381
+INDIRECT-UPREGULATOR       1337
+INDIRECT-DOWNREGULATOR     1316
+ANTAGONIST                  937
+PRODUCT-OF                  917
+PART-OF                     877
+AGONIST                     646
+AGONIST-ACTIVATOR            28
+SUBSTRATE_PRODUCT-OF         24
+AGONIST-INHIBITOR            10
+Name: relation, dtype: int64
 
-- test:
-- pos: 0
-- neg: 220315
+NONE                      9683
+INHIBITOR                 1136
+SUBSTRATE                  494
+DIRECT-REGULATOR           452
+INDIRECT-DOWNREGULATOR     329
+INDIRECT-UPREGULATOR       298
+PART-OF                    254
+ACTIVATOR                  234
+ANTAGONIST                 214
+PRODUCT-OF                 156
+AGONIST                    126
+AGONIST-ACTIVATOR           10
+SUBSTRATE_PRODUCT-OF         3
+AGONIST-INHIBITOR            2
+Name: relation, dtype: int64
+```
 
 ## LM Results
 | Base Language Model | Annotation Style | Negative Samples in Training Set | F1 Score on Development Set |
 | --- | --- | --- | --- |
-| 
+| bert_base_uncased | none | no | 0.552 |
+| scibert_uncased | scibert | no | 0.739 |
+| biobert_base_v1.1 | biobert | no | 0.727 |
+| bert_base_uncased | none | yes | 0.348 |
+| scibert_uncased | scibert | yes | 0.586 |
+| biobert_base_v1.1 | biobert | yes | 0.581 |
