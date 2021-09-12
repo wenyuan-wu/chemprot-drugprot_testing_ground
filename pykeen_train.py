@@ -11,10 +11,9 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     )
 
 
-def get_kd_embd(entity, result):
-    entity_embedding_tensor = result.model.entity_representations[0](indices=None).cpu().detach().numpy()
+def get_kd_embd(entity, embd_tensor, result):
     idx = result.training.entity_to_id[entity]
-    return entity_embedding_tensor[idx]
+    return embd_tensor[idx]
 
 
 def main():
@@ -23,19 +22,21 @@ def main():
     result = pipeline(
         training=train_path,
         testing=test_path,
-        model='TransE',
+        model='PairRE',
+
         # epochs=128,  # short epochs for testing - you should go higher
     )
     result.save_to_directory('model/test_drugprot_transe')
     df_train = pd.DataFrame.from_dict(load_from_bin("train_org"), orient="index")
-
+    entity_embedding_tensor = result.model.entity_representations[0](indices=None).cpu().detach().numpy()
+    logging.info(f"sheep: {entity_embedding_tensor.shape}")
     pos_count = 0
     neg_count = 0
     for idx, row in tqdm(df_train.iterrows(), total=df_train.shape[0]):
         arg1 = list(row["ent_dict"].values())[0]["Text"].lower()
         arg2 = list(row["ent_dict"].values())[1]["Text"].lower()
         try:
-            get_kd_embd(arg1, result)
+            get_kd_embd(arg1, entity_embedding_tensor, result)
             pos_count += 1
             # print(f"entity: {entity}\nembd: {get_kd_embd(entity, result)}")
         except KeyError:
@@ -44,7 +45,7 @@ def main():
             neg_count += 1
 
         try:
-            get_kd_embd(arg2, result)
+            get_kd_embd(arg2, entity_embedding_tensor, result)
             pos_count += 1
             # print(f"entity: {entity}\nembd: {get_kd_embd(entity, result)}")
         except KeyError:
