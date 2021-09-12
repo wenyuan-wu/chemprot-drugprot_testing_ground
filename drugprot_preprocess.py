@@ -24,17 +24,17 @@ def get_df_from_data(data_set="training"):
     abs_file_name = join(data_path, "drugprot_" + data_set + "_abstracts" + ".tsv")
     logging.info(f"loading data from {abs_file_name}")
     abs_col_names = ["Title", "Abstract"]
-    abs_df = pd.read_csv(abs_file_name, sep="\t", names=abs_col_names, index_col=0)
+    abs_df = pd.read_csv(abs_file_name, sep="\t", names=abs_col_names, index_col=0, keep_default_na=False)
 
     # entity mention annotations
     ent_file_name = join(data_path, "drugprot_" + data_set + "_entities" + ".tsv")
     ent_col_names = ["Entity #", "Type", "Start", "End", "Text"]
-    ent_df = pd.read_csv(ent_file_name, sep="\t", names=ent_col_names, index_col=0)
+    ent_df = pd.read_csv(ent_file_name, sep="\t", names=ent_col_names, index_col=0, keep_default_na=False)
 
     # drugprot detailed relation annotations
     rel_file_name = join(data_path, "drugprot_" + data_set + "_relations" + ".tsv")
     rel_col_names = ["Relation", "Arg1", "Arg2"]
-    rel_df = pd.read_csv(rel_file_name, sep="\t", names=rel_col_names, index_col=0)
+    rel_df = pd.read_csv(rel_file_name, sep="\t", names=rel_col_names, index_col=0, keep_default_na=False)
 
     return abs_df, ent_df, rel_df
 
@@ -51,12 +51,12 @@ def get_df_from_data_test():
     # abstracts
     abs_file_name = join(data_path, "test_background" + "_abstracts" + ".tsv")
     abs_col_names = ["Title", "Abstract"]
-    abs_df = pd.read_csv(abs_file_name, sep="\t", names=abs_col_names, index_col=0)
+    abs_df = pd.read_csv(abs_file_name, sep="\t", names=abs_col_names, index_col=0, keep_default_na=False)
 
     # entity mention annotations
     ent_file_name = join(data_path, "test_background" + "_entities" + ".tsv")
     ent_col_names = ["Entity #", "Type", "Start", "End", "Text"]
-    ent_df = pd.read_csv(ent_file_name, sep="\t", names=ent_col_names, index_col=0)
+    ent_df = pd.read_csv(ent_file_name, sep="\t", names=ent_col_names, index_col=0, keep_default_na=False)
 
     return abs_df, ent_df
 

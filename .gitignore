@@ -13,3 +13,6 @@ data/*
 
 # saved model
 model
+
+# pykeen dataset
+dataset/
