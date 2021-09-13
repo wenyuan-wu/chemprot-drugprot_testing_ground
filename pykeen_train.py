@@ -23,7 +23,6 @@ def main():
         training=train_path,
         testing=test_path,
         model='PairRE',
-
         # epochs=128,  # short epochs for testing - you should go higher
     )
     result.save_to_directory('model/test_drugprot_transe')
@@ -38,7 +37,7 @@ def main():
         try:
             get_kd_embd(arg1, entity_embedding_tensor, result)
             pos_count += 1
-            # print(f"entity: {entity}\nembd: {get_kd_embd(entity, result)}")
+            # print(f"entity: {arg1}\nembd: {get_kd_embd(arg1, entity_embedding_tensor, result)}")
         except KeyError:
             # print("ERROR!")
             # print(entity)
@@ -47,7 +46,7 @@ def main():
         try:
             get_kd_embd(arg2, entity_embedding_tensor, result)
             pos_count += 1
-            # print(f"entity: {entity}\nembd: {get_kd_embd(entity, result)}")
+            # print(f"entity: {arg2}\nembd: {get_kd_embd(arg2, entity_embedding_tensor, result)}")
         except KeyError:
             # print("ERROR!")
             # print(entity)
