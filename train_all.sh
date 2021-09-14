@@ -1,8 +1,6 @@
 #!/bin/bash
 
 python drugprot_preprocess.py
-# train_org, dev_org, test_org
-
 python drugprot_prepare_data.py
 
 python lm_train.py

@@ -23,7 +23,7 @@ def prepare_data(dataset="train", annotation="raw", drop_none=False, frac=0.99, 
     data_name = dataset + "_org"
     df = pd.DataFrame.from_dict(load_from_bin(data_name), orient="index")
     ann_style = "text_" + annotation
-    df = df[[ann_style, "relation"]]
+    df = df[[ann_style, "relation", "pmid", "Arg1", "Arg2", "Ent1", "Ent2"]]
     if drop_none:
         # drop sentences with NONE relation
         df = df.drop(df[df["relation"] == "NONE"].index)

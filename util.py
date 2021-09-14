@@ -89,10 +89,10 @@ def create_tensor_dataset(data_name, tokenizer, max_length=192, annotation="raw"
     # Get the lists of sentences and their labels.
     if annotation == "raw":
         sentences = data_df.text_raw.values
-    elif annotation == "scibert":
-        sentences = data_df.text_scibert.values
-    elif annotation == "biobert":
-        sentences = data_df.text_biobert.values
+    elif annotation == "sci":
+        sentences = data_df.text_sci.values
+    elif annotation == "bio":
+        sentences = data_df.text_bio.values
     labels = data_df.label.values
 
     # get sentence length distribution information
@@ -232,3 +232,24 @@ def save_model(model_name, model, tokenizer):
 
     # Good practice: save your training arguments together with the trained model
     # torch.save(args, os.path.join(output_dir, 'training_args.bin'))
+
+
+def get_sent_embd(hidden_states):
+    """
+    Calculate sentence embeddings in a batch from hidden states, the second to last layer will be considered
+    :param hidden_states: outputted hidden states from model
+    :return: list of sentence embeddings
+    """
+    sentence_embeddings = []
+    token_embeddings_stack = torch.stack(hidden_states, dim=1)
+    # logging.info(f"token embeddings stack size: {token_embeddings_stack.size()}")
+    for batch in range(token_embeddings_stack.size()[0]):
+        batch_embd = token_embeddings_stack[batch]
+        # second to last layer will be used for sentence embedding
+        token_vecs = batch_embd[-2]
+        # Calculate the average of all token vectors
+        sentence_embedding = torch.mean(token_vecs, dim=0)
+        sentence_embedding = sentence_embedding.to('cpu').numpy()
+        sentence_embeddings.append(sentence_embedding)
+    return sentence_embeddings
+

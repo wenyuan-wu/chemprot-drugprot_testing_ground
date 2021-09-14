@@ -16,6 +16,7 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     # datefmt='%d-%b-%y %H:%M:%S'
                     )
 
+
 if torch.cuda.is_available():
     device = torch.device("cuda")
     logging.info(f'There are {torch.cuda.device_count()} GPU(s) available.')
@@ -30,7 +31,7 @@ tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=Tru
 
 # tiny dataset for testing
 logging.warning("using tiny dataset for testing...")
-train_dataset = create_tensor_dataset("train_tiny_none", tokenizer)
+train_dataset = create_tensor_dataset("train_raw_tiny", tokenizer, annotation="raw")
 
 # Calculate the number of samples to include in each set.
 train_size = int(0.9 * len(train_dataset))
@@ -324,6 +325,6 @@ print("Training complete!")
 # Create a DataFrame from our training statistics.
 df_stats = get_train_stats(training_stats)
 print(df_stats)
-model_name = "bert_tiny_none"
+model_name = "bert_raw_tiny"
 save_train_stats(df_stats, model_name)
 save_model(model_name, model, tokenizer)

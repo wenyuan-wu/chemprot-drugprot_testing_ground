@@ -234,19 +234,19 @@ def create_data_dict(abs_df, ent_df, rel_df):
                                               "text_raw": sent,
                                               "text_sci": sent_sci,
                                               "text_bio": sent_bio,
+                                              "Ent1": chem["Text"],
+                                              "Ent2": gene["Text"]
                                               }
                         # check if relation exists in this sentence
                         if rel_tup in rel_dict.keys():
                             pos_count += 1
-                            data_dict[sent_id]["rel_dict"] = rel_dict[rel_tup]
+                            data_dict[sent_id]["Arg1"] = rel_dict[rel_tup]["Arg1"]
+                            data_dict[sent_id]["Arg2"] = rel_dict[rel_tup]["Arg2"]
                             data_dict[sent_id]["relation"] = rel_dict[rel_tup]["Relation"]
                         else:
                             neg_count += 1
-                            rel_dict_tmp = {"Arg1": f"Arg1:{chem['Entity #']}",
-                                            "Arg2": f"Arg2:{gene['Entity #']}",
-                                            "Relation": "NONE"
-                                            }
-                            data_dict[sent_id]["rel_dict"] = rel_dict_tmp
+                            data_dict[sent_id]["Arg1"] = f"Arg1:{chem['Entity #']}"
+                            data_dict[sent_id]["Arg2"] = f"Arg2:{gene['Entity #']}"
                             data_dict[sent_id]["relation"] = "NONE"
 
             # update range
