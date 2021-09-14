@@ -61,7 +61,6 @@ def main():
             # print(entity)
             arg2_list.append(np.zeros(200))
             neg_count += 1
-        break
     logging.info(f"pos: {pos_count}, neg: {neg_count}, ratio: {pos_count / (pos_count + neg_count)}")
     df["arg1_embd"] = arg1_list
     df["arg2_embd"] = arg2_list
@@ -101,7 +100,6 @@ def main():
             # print(entity)
             arg2_list.append(np.zeros(200))
             neg_count += 1
-        break
     logging.info(f"pos: {pos_count}, neg: {neg_count}, ratio: {pos_count / (pos_count + neg_count)}")
     df["arg1_embd"] = arg1_list
     df["arg2_embd"] = arg2_list

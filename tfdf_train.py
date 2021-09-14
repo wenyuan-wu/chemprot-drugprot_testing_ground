@@ -48,7 +48,7 @@ predicted_labels = np.argmax(pred, axis=1)
 print("="*20)
 print(predicted_labels.shape)
 
-idx_to_label_dict = load_from_bin("idx_to_label_dict_raw")
+idx_to_label_dict = load_from_bin("idx_to_label_dict_sci")
 print(df.columns)
 df["label_pred"] = predicted_labels
 df["relation_pred"] = df["label_pred"].map(idx_to_label_dict)
