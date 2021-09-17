@@ -1,4 +1,4 @@
-from util import load_from_bin
+from util import load_from_bin, check_gpu_mem
 from pprint import pprint
 
-pprint(load_from_bin("dev_raw_tiny"))
+print(check_gpu_mem())

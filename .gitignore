@@ -12,7 +12,8 @@ data/*
 !data/data_download.sh
 
 # saved model
-model
+model/
+model_bk/
 
 # pykeen dataset
 dataset/

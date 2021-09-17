@@ -11,6 +11,7 @@ import csv
 import datetime
 import seaborn as sns
 import matplotlib.pyplot as plt
+from transformers import BertTokenizer
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO,
@@ -77,32 +78,31 @@ def sent_len_dist(sents, tokenizer, max_length=192):
                  .format(num_over, len(lengths), float(num_over) / float(len(lengths))))
 
 
-def create_tensor_dataset(data_name, tokenizer, max_length=192, annotation="raw"):
+def create_tensor_dataset(tokenizer: BertTokenizer,
+                          dataset="training", max_length=192, annotation="raw", on_tiny=False) -> TensorDataset:
+    """
+    Create tensor dataset via tokenizer, either from downloaded or from local files
+    :param tokenizer: BertTokenizer from huggingface
+    :param dataset: name of the dataset, ["training", "development", "test"]
+    :param max_length: maximal length of the sentence, default 192
+    :param annotation: annotation style, ["raw", "sci", "bio"]
+    :param on_tiny: boolean, if perform on tiny dataset
+    :return: TensorDataset
+    """
     logging.info(f"max length: {max_length}")
-    data_df = load_from_bin(data_name)
+    data_df = load_from_bin(f"{dataset}_tiny") if on_tiny else load_from_bin(f"{dataset}")
     data_df = data_df.reset_index()
     data_df.rename(columns={'index': "sent_id"}, inplace=True)
-    # TODO: fix cat issues
-    # data_df.relation = pd.Categorical(data_df.relation)
-    # data_df["label"] = data_df.relation.cat.codes
-
     # Get the lists of sentences and their labels.
-    if annotation == "raw":
-        sentences = data_df.text_raw.values
-    elif annotation == "sci":
-        sentences = data_df.text_sci.values
-    elif annotation == "bio":
-        sentences = data_df.text_bio.values
+    sentences = data_df[f"text_{annotation}"].values
     labels = data_df.label.values
 
     # get sentence length distribution information
     # sent_len_dist(sentences, tokenizer)
 
-    # Tokenize all of the sentences and map the tokens to thier word IDs.
+    # Tokenize all of the sentences and map the tokens to their word IDs.
     input_ids = []
     attention_masks = []
-
-    # For every sentence...
     for sent in tqdm(sentences):
         # `encode_plus` will:
         #   (1) Tokenize the sentence.
@@ -154,8 +154,13 @@ def check_gpu_mem():
     return df
 
 
-# Function to calculate the accuracy of our predictions vs labels
 def flat_accuracy(preds, labels):
+    """
+    Function to calculate the accuracy of our predictions vs labels
+    :param preds:
+    :param labels:
+    :return: float
+    """
     pred_flat = np.argmax(preds, axis=1).flatten()
     labels_flat = labels.flatten()
     return np.sum(pred_flat == labels_flat) / len(labels_flat)
@@ -171,42 +176,45 @@ def format_time(elapsed):
     return str(datetime.timedelta(seconds=elapsed_rounded))
 
 
-def get_train_stats(train_stats):
+def get_train_stats(train_stats: list) -> pd.DataFrame:
+    """
+    Create dataframe of training status
+    :param train_stats: list of dictionary of training status
+    :return: pandas dataframe
+    """
     # Create a DataFrame from our training statistics.
     df_stats = pd.DataFrame(data=train_stats)
-
     # Use the 'epoch' as the row index.
     df_stats = df_stats.set_index('epoch')
-
     # A hack to force the column headers to wrap.
     # df = df.style.set_table_styles([dict(selector="th",props=[('max-width', '50px')])])
-
     # Display floats with two decimal places.
     pd.set_option('precision', 2)
-
     # Display the table.
     return df_stats
 
 
-def save_train_stats(df_stats, model_name):
+def save_train_stats(df_stats: pd.DataFrame, model_name: str) -> None:
+    """
+    Visualise training status and save figure
+    :param df_stats: dataframe of the training status
+    :param model_name: the name of the model (saved file)
+    :return: None
+    """
     # Use plot styling from seaborn.
     sns.set(style='darkgrid')
-
     # Increase the plot size and font size.
     sns.set(font_scale=1.5)
     plt.rcParams["figure.figsize"] = (12, 6)
-
     # Plot the learning curve.
     plt.plot(df_stats['Training Loss'], 'b-o', label="Training")
     plt.plot(df_stats['Valid. Loss'], 'g-o', label="Validation")
-
     # Label the plot.
     plt.title("Training & Validation loss")
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.legend()
     plt.xticks([1, 2, 3, 4])
-
     output_dir = join("model", model_name)
     # Create output directory if needed
     if not os.path.exists(output_dir):
@@ -214,22 +222,30 @@ def save_train_stats(df_stats, model_name):
     file_name = f"train_stat_{datetime.datetime.now()}.png"
     output_path = join(output_dir, file_name)
     plt.savefig(output_path)
+    file_name = f"train_stat_{datetime.datetime.now()}.tsv"
+    output_path = join(output_dir, file_name)
+    df_stats.to_csv(output_path, sep="\t", header=True, index=True)
+    plt.clf()
 
 
-def save_model(model_name, model, tokenizer):
+def save_model(model_name: str, model, tokenizer) -> None:
+    """
+    Save model and tokenizer in desired location
+    :param model_name: string, folder name
+    :param model: finetuned model
+    :param tokenizer: huggingface tokenizer
+    :return: None
+    """
     output_dir = join("model", model_name)
     # Create output directory if needed
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-
-    print("Saving model to %s" % output_dir)
-
+    logging.info(f"Saving model to {output_dir}")
     # Save a trained model, configuration and tokenizer using `save_pretrained()`.
     # They can then be reloaded using `from_pretrained()`
     model_to_save = model.module if hasattr(model, 'module') else model  # Take care of distributed/parallel training
     model_to_save.save_pretrained(output_dir)
     tokenizer.save_pretrained(output_dir)
-
     # Good practice: save your training arguments together with the trained model
     # torch.save(args, os.path.join(output_dir, 'training_args.bin'))
 

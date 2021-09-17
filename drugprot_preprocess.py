@@ -3,8 +3,10 @@ from os.path import join
 import logging
 from tqdm import tqdm
 import pandas as pd
-from util import save_to_bin
-from pprint import pprint
+from typing import Tuple, Any
+from util import save_to_bin, load_from_bin
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO,
@@ -12,9 +14,9 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     )
 
 
-def get_df_from_data(data_set="training"):
+def get_df_from_data(data_set="training") -> Tuple[Any, Any, Any]:
     """
-    Function to create pandas DataFrame from data files
+    Function to create pandas DataFrame from tsv data files
     :param data_set: string, type for dataset ["training", "development"]
     :return: pandas dataframe w.r.t. dataset
     """
@@ -40,9 +42,9 @@ def get_df_from_data(data_set="training"):
     return abs_df, ent_df, rel_df
 
 
-def get_df_from_data_test():
+def get_df_from_data_test() -> Tuple[Any, Any]:
     """
-    Function to create pandas DataFrame from data files, test set
+    Function to create pandas DataFrame from tsv data files, test set only
     :return: pandas dataframe w.r.t. dataset
     """
     # Drugprot test set
@@ -63,7 +65,7 @@ def get_df_from_data_test():
     return abs_df, ent_df
 
 
-def check_sub_range(range_1, range_2):
+def check_sub_range(range_1: range, range_2: range) -> set:
     """
     Function to check if two range has intersection
     :param range_1: first range
@@ -78,27 +80,28 @@ def remove_tag():
     raise NotImplementedError
 
 
-def sent_annotation(gene, chem, sent, soi, annotation):
+def sent_annotation(gene: dict, chem: dict, sent: str, soi: int, annotation: str) -> str:
     """
     Annotate sentence in different styles, i.e. scibert, biobert, etc.
-    :param gene: gene expression
-    :param chem: chemical expression
+    :param gene: gene expression, dictionary
+    :param chem: chemical expression, dictionary
     :param sent: sentence, string
-    :param soi: beginning of the sentence indicator
-    :param annotation: annotation style
-    :return: annotated sentence
+    :param soi: beginning of the sentence indicator, integer
+    :param annotation: annotation style, string
+    :return: annotated sentence, string
     """
-    sent_list = []
     # update ent_dict to focus on the only two entities involved in the relation
     ent_dict = {gene["Entity #"]: gene, chem["Entity #"]: chem}
     srt_list = sorted(ent_dict.items(), key=lambda x: x[1]["Start"], reverse=False)
+    sent_list = []
 
     if annotation == "sci":
         """
-        idx_1: start of the first entity
-        char_1: annotation for the start character of the first entity, depending on the type
-        idx_2: end the first entity
-        char_2: annotation for the end character of the first entity, depending on the type
+        SciBert style annotation: surround chemicals with "<< >>" and genes with "[[ ]]"
+        idx_1: index for the beginning of the first entity
+        char_1: annotation for the beginning character of the first entity, depending on the type
+        idx_2: index for the ending of the first entity
+        char_2: annotation for the ending character of the first entity, depending on the type
         idx_3, char_3, idx_4, char_4: same deal to the second character
         """
         idx_1 = srt_list[0][1]["Start"] - soi
@@ -122,11 +125,12 @@ def sent_annotation(gene, chem, sent, soi, annotation):
 
     elif annotation == "bio":
         """
-        idx_1: start of the first entity
-        idx_2: end the first entity
-        idx_range_1: index span of the first entity
+        BioBert style annotation: anonymize chemicals into "$CHEMICAL#" and genes into "$GENE#"
+        idx_1: index for the beginning of the first entity
+        idx_2: index for the ending of the first entity
+        idx_range_1: index for the span of the first entity
         char_1: annotation of the first entity, depending on the type
-        idx_3, idx_4, idx_range_2, char_2: same deal to the second character
+        idx_3, idx_4, idx_range_2, char_2: same deal to the second entity
         """
         idx_1 = srt_list[0][1]["Start"] - soi
         idx_2 = srt_list[0][1]["End"] - soi - 1
@@ -150,7 +154,7 @@ def sent_annotation(gene, chem, sent, soi, annotation):
     return "".join(sent_list)
 
 
-def create_data_dict(abs_df, ent_df, rel_df):
+def create_data_dict(abs_df: pd.DataFrame, ent_df: pd.DataFrame, rel_df: pd.DataFrame) -> dict:
     """
     Create training data from raw files with different annotation styles
     :param abs_df: abstract dataframe
@@ -158,55 +162,64 @@ def create_data_dict(abs_df, ent_df, rel_df):
     :param rel_df: relations dataframe
     :return: dictionary of preprocessed data
     """
-    # use spacy to split abstracts into sentences
+    pmids = list(abs_df.index.values)  # training set pmids: 3500
+    logging.info(f"Number of PMIDs: {len(pmids)}")
+    # use spacy to split text into sentences
     nlp = English()
     nlp.add_pipe("sentencizer")
-    pmids = abs_df.index.values.tolist()  # training set pmids: 3500
-    logging.info(f"Number of PMIDs: {len(pmids)}")
-    # getting none distribution information
+    # getting none relation distribution information
     pos_count = 0
     neg_count = 0
     data_dict = {}
     for pmid in tqdm(pmids):
-        # for debug purpose
+        # for debugging purpose
         # pmid = 17380207
-        complete = " ".join([abs_df.at[pmid, "Title"], abs_df.at[pmid, "Abstract"]])
-
+        # create entity offset dictionary, key: range(start, end), value: entity information
         offset_to_ent_dict = {}
         try:
+            # if there are multiple entities
             for index, row in ent_df.loc[pmid].iterrows():
                 key = range(row["Start"], row["End"])
                 offset_to_ent_dict[key] = row.to_dict()
         except KeyError:
+            # if there are no entities, create dummy dictionary as placeholder
             offset_to_ent_dict = {range(10240, 10241): {'Entity #': 'Null',
                                                         'Type': 'CHEMICAL',
                                                         'Start': 10240,
                                                         'End': 10241,
-                                                        'Text': 'placeholder'}
-                                  }
+                                                        'Text': 'placeholder'}}
         except AttributeError:
+            # if there is only one entity
             key = range(ent_df.loc[pmid]["Start"], ent_df.loc[pmid]["End"])
             offset_to_ent_dict[key] = ent_df.loc[pmid].to_dict()
 
+        # create relation dictionary, key: tuple(arg1, arg2), value: relation informaiton
         rel_dict = {}
         try:
+            # if there are multiple relations
             for index, row in rel_df.loc[pmid].iterrows():
                 key = (row["Arg1"][5:], row["Arg2"][5:])
                 rel_dict[key] = row.to_dict()
         except KeyError:
+            # if there are no relations, create dummy dictionary as placeholder
             rel_dict = {('Null1', 'Null2'): {'Relation': 'Placeholder', 'Arg1': 'Arg1:Null1', 'Arg2': 'Arg2:Null2'}}
         except AttributeError:
+            # if there is only one relation
             key = (rel_df.loc[pmid]["Arg1"][5:], rel_df.loc[pmid]["Arg2"][5:])
             rel_dict[key] = rel_df.loc[pmid].to_dict()
 
+        # complete = title + abstract
+        complete = " ".join([abs_df.at[pmid, "Title"], abs_df.at[pmid, "Abstract"]])
         doc = nlp(complete)
+
+        # start of the sentence
         soi = 0
         for idx, sent in enumerate(doc.sents):
             sent = sent.text + " "
             eoi = len(sent) + soi
             sent_range = range(soi, eoi)
 
-            # check entities
+            # check if entities exist in this sentence
             ent_dict = {}
             gene_list = []
             chem_list = []
@@ -260,25 +273,97 @@ def create_data_dict(abs_df, ent_df, rel_df):
     return data_dict
 
 
-def main():
-    data_set = "training"
-    abs_df, ent_df, rel_df = get_df_from_data(data_set)
-    data_dict_train = create_data_dict(abs_df, ent_df, rel_df)
-    save_to_bin(data_dict_train, "train_org")
+def prepare_data(data_dict: dict, dataset="training", annotation="raw",
+                 drop_none=False, frac=0.99, random_state=1024) -> None:
+    """
+    Prepare data for training from preprocessed data dictionary, especially mapping
+    :param data_dict: data dictionary from preprocessed tsv files
+    :param dataset: type of the dataset, ["train", "dev", "test"]
+    :param annotation: annotation style, ["raw", "sci", "bio"]
+    :param drop_none: boolean, if True then drop NONE relation in dataframe
+    :param frac: fraction to create tiny dataset for testing
+    :param random_state: random state for dropping
+    :return: None, prepared files will be saved accordingly
+    """
+    # data_name = dataset + "_org"
+    df = pd.DataFrame.from_dict(data_dict, orient="index")
+    # ann_style = "text_" + annotation
+    # df = df[[ann_style, "relation", "pmid", "Arg1", "Arg2", "Ent1", "Ent2"]]
+    if drop_none:
+        # drop sentences with NONE relation
+        df = df.drop(df[df["relation"] == "NONE"].index)
+    if dataset == "training":
+        # convert relation into numerical categories
+        df.relation = pd.Categorical(df.relation)
+        df["label"] = df.relation.cat.codes
+        idx_to_label_dict = dict(enumerate(df['relation'].cat.categories))
+        label_to_idx_dict = {v: k for k, v in idx_to_label_dict.items()}
+        # create tiny dataset for quick testing purpose
+        df_tiny = df.drop(df.sample(frac=frac, random_state=random_state).index)
+        # saving files as binary format
+        save_to_bin(label_to_idx_dict, f"label_to_idx_dict")
+        save_to_bin(idx_to_label_dict, f"idx_to_label_dict")
+        save_to_bin(df, f"{dataset}")
+        save_to_bin(df_tiny, f"{dataset}_tiny")
+    else:
+        # mapping relations into numerical categories from loaded mapping dictionary
+        label_to_idx_dict = load_from_bin(f"label_to_idx_dict")
+        df["label"] = df["relation"].map(label_to_idx_dict)
+        df_tiny = df.drop(df.sample(frac=frac, random_state=random_state).index)
+        save_to_bin(df, f"{dataset}")
+        save_to_bin(df_tiny, f"{dataset}_tiny")
 
-    data_set = "development"
-    abs_df, ent_df, rel_df = get_df_from_data(data_set)
-    data_dict_dev = create_data_dict(abs_df, ent_df, rel_df)
-    save_to_bin(data_dict_dev, "dev_org")
-    # for debug purpose
-    # pprint(data_dict_dev)
+
+def plot_label_dist(dataset="training", drop_none=False) -> plt:
+    """
+    Plot the distribution information of the dataset
+    :param dataset: training or development set
+    :param drop_none: boolean, if True then drop NONE relation in dataframe
+    :return: matplotlib.pyplot instance
+    """
+    df = load_from_bin(dataset)
+    file_name = f"info/{dataset}.png"
+    if drop_none:
+        df = df.drop(df[df["relation"] == "NONE"].index)
+        file_name = f"info/{dataset}_drop_none.png"
+    logging.info(f"distribution info:\n{df['relation'].value_counts()}")
+    # plot data
+    sns.set(style='darkgrid')
+    # Increase the plot size and font size.
+    sns.set(font_scale=2)
+    plt.rcParams["figure.figsize"] = (50, 25)
+    # Plot the number of tokens of each length.
+    sns.countplot(x="relation", data=df)
+    plt.xticks(
+        rotation=45,
+        horizontalalignment='right',
+        # fontweight='light',
+        # fontsize='x-large'
+    )
+    plt.title('Relation Distribution')
+    plt.xlabel('Relation')
+    plt.ylabel('# of Training Samples')
+    plt.savefig(file_name)
+    plt.clf()
+
+
+def main():
+    for dataset in ["training", "development"]:
+        abs_df, ent_df, rel_df = get_df_from_data(dataset)
+        data_dict = create_data_dict(abs_df, ent_df, rel_df)
+        prepare_data(data_dict, dataset=dataset)
+        # save plotted images of label distribution information
+        plot_label_dist(dataset)
+        plot_label_dist(dataset, drop_none=True)
 
     # preprocess data for test set
+    dataset = "test"
     abs_df, ent_df = get_df_from_data_test()
+    # test set doesn't have relation tsv file, using place holder dataframe
     column_names = ["a", "b", "c"]
     rel_df = pd.DataFrame(columns=column_names)
-    data_dict_test = create_data_dict(abs_df, ent_df, rel_df)
-    save_to_bin(data_dict_test, "test_org")
+    data_dict = create_data_dict(abs_df, ent_df, rel_df)
+    prepare_data(data_dict, dataset=dataset)
 
 
 if __name__ == '__main__':

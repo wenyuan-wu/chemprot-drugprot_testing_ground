@@ -246,3 +246,6 @@ Name: relation, dtype: int64
 | bert_base_uncased | none | yes | 0.348 |
 | scibert_uncased | scibert | yes | 0.586 |
 | biobert_base_v1.1 | biobert | yes | 0.581 |
+
+## Code structure
+drugprot_preprocess_data
