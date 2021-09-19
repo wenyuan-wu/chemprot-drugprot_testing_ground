@@ -2,7 +2,7 @@ import torch
 import logging
 import pandas as pd
 import numpy as np
-from util import create_tensor_dataset, check_gpu_mem, flat_accuracy, format_time
+from util import create_tensor_dataset, check_gpu_mem, flat_accuracy, format_time, check_gpu
 from util import get_train_stats, save_train_stats, save_model
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler, random_split
 from transformers import BertTokenizer, BertForSequenceClassification, AdamW, BertConfig
@@ -18,14 +18,12 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
 
 
 def lm_fine_tune(args: dict) -> None:
-    if torch.cuda.is_available():
-        device = torch.device("cuda")
-        logging.info(f'There are {torch.cuda.device_count()} GPU(s) available.')
-        logging.info(f'Use the GPU: {torch.cuda.get_device_name(0)}')
-    else:
-        logging.info('No GPU available, using the CPU instead.')
-        device = torch.device("cpu")
-
+    """
+    Fine tune the downloaded Bert model on the training dataset
+    :param args: dictionary contains essential parameters for fine tuning
+    :return: None, model will be saved accordingly
+    """
+    device = check_gpu()
     model_name = args["model_name"]
     annotation = args["annotation"]
     max_length = args["max_length"]
@@ -66,8 +64,9 @@ def lm_fine_tune(args: dict) -> None:
         output_attentions=False,  # Whether the model returns attentions weights.
         output_hidden_states=False,  # Whether the model returns all hidden-states.
     )
-    # data parallel
-    model = nn.DataParallel(model, device_ids=device_ids)
+    # data parallel TODO: fix data parallel issue on multiple GPUs
+    # model = nn.DataParallel(model, device_ids=device_ids)
+    model.to(device)
     logging.info(f"GPU memory info:\n{check_gpu_mem()}")
 
     # Note: AdamW is a class from the huggingface library (as opposed to pytorch)

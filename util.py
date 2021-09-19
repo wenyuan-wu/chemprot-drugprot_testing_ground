@@ -269,3 +269,18 @@ def get_sent_embd(hidden_states):
         sentence_embeddings.append(sentence_embedding)
     return sentence_embeddings
 
+
+def check_gpu():
+    """
+    Function to check if GPU is available for model training
+    :return: pytorch device
+    """
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+        logging.info(f'There are {torch.cuda.device_count()} GPU(s) available.')
+        logging.info(f'Use the GPU: {torch.cuda.get_device_name(0)}')
+
+    else:
+        logging.info('No GPU available, using the CPU instead.')
+        device = torch.device("cpu")
+    return device

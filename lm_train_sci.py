@@ -2,7 +2,7 @@ import torch
 import logging
 import pandas as pd
 import numpy as np
-from util import create_tensor_dataset, check_gpu_mem, flat_accuracy, format_time
+from util import create_tensor_dataset, check_gpu_mem, flat_accuracy, format_time, check_gpu
 from util import get_train_stats, save_train_stats, save_model
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler, random_split
 from transformers import BertTokenizer, BertForSequenceClassification, AdamW, BertConfig
@@ -23,7 +23,7 @@ if torch.cuda.is_available():
 
 else:
     logging.info('No GPU available, using the CPU instead.')
-    device = torch.device("cpu")
+    device = check_gpu()
 
 # load the BERT tokenizer.
 tokenizer = BertTokenizer.from_pretrained('allenai/scibert_scivocab_uncased', do_lower_case=True)
