@@ -8,7 +8,12 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     # datefmt='%d-%b-%y %H:%M:%S'
                     )
 
-logging.info(f'Found TF-DF v{tfdf.__version__}')
+
+def train_tfdf():
+    logging.info(f'Found TF-DF v{tfdf.__version__}')
+    pass
+
+
 
 dataset_df = pd.read_csv("/tmp/penguins.csv")
 print(dataset_df.head(3))

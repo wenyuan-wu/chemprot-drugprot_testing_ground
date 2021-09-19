@@ -1,13 +1,11 @@
 #!/bin/bash
 
 python drugprot_preprocess.py
-python drugprot_prepare_data.py
+python drugprot_lm_finetune.py
+python drugprot_lm_predict.py
+python drugprot_lm_evaluate.py
 
-python lm_train.py
-python lm_predict.py
+python pykeen_prepare_data.py
+python pykeen_train.py
 
-python lm_train_bio.py
-python lm_predict_bio.py
-
-python lm_train_sci.py
-python lm_predict_sci.py
+python tfdf_train.py

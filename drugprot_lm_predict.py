@@ -132,7 +132,7 @@ def main():
     for dataset in datasets:
         for model in models:
             for annotation in annotations:
-                logging.info(F"dataset: {dataset}, model: {model}, annotation: {annotation}")
+                logging.info(f"dataset: {dataset}, model: {model}, annotation: {annotation}")
                 args["model_name"] = model
                 args["annotation"] = annotation
                 args["dataset"] = dataset

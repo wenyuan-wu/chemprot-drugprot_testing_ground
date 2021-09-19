@@ -9,13 +9,25 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     )
 
 
-def create_kg_data(dataframe: pd.DataFrame, contains_none=True):
+def create_kg_data(dataframe: pd.DataFrame, contains_none=True) -> list:
+    """
+    Prepare data for pykeen to train kg model
+    :param dataframe: dataframe to load for process
+    :param contains_none: if set contains none value
+    :return: list of tuples
+    """
     return list(zip(dataframe["Ent1"].values,
                     dataframe["relation"].values,
                     dataframe["Ent2"].values))
 
 
-def write_to_file(kg_list, file_name):
+def write_to_file(kg_list: list, file_name: str) -> None:
+    """
+    Function to write processed list into tsv file
+    :param kg_list: list of node and relation tuples
+    :param file_name: string to indicate file name for saving
+    :return: None
+    """
     file_path = join("data", "drugprot_preprocessed", "kg", file_name)
     with open(file_path, "w") as outfile:
         for row in kg_list:
@@ -28,10 +40,12 @@ def write_to_file(kg_list, file_name):
 
 
 def main():
-    df_train = pd.DataFrame.from_dict(load_from_bin("train_org"), orient="index")
-    write_to_file(create_kg_data(df_train), "drugprot_kg_train.tsv")
-    df_dev = pd.DataFrame.from_dict(load_from_bin("dev_org"), orient="index")
-    write_to_file(create_kg_data(df_dev), "drugprot_kg_dev.tsv")
+    train_list = create_kg_data(load_from_bin("training"))
+    write_to_file(train_list, "drugprot_kg_train.tsv")
+    dev_list = create_kg_data(load_from_bin("development"))
+    write_to_file(dev_list, "drugprot_kg_dev.tsv")
+    combi_list = train_list + dev_list
+    write_to_file(combi_list, "drugprot_kg_train_combi.tsv")
 
 
 if __name__ == '__main__':

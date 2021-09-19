@@ -11,6 +11,10 @@ train_tiny = load_from_bin("training_tiny")
 print(train_tiny.head(3))
 print(train_tiny.columns)
 
+dev_tiny = load_from_bin("development_tiny")
+print(dev_tiny.head(3))
+print(dev_tiny.columns)
+
 test_tiny = load_from_bin("test_tiny")
 print(test_tiny.head(3))
 print(test_tiny.columns)
