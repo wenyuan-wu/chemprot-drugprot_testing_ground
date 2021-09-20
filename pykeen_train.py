@@ -72,6 +72,7 @@ def prepare_embd(result, dataset, lm_model_name, annotation, kg_model_name, on_t
     df = load_from_bin(dataset)
     entity_embedding_tensor = result.model.entity_representations[0](indices=None).cpu().detach().numpy()
     logging.info(f"sheep: {entity_embedding_tensor.shape}")
+    embd_shape = entity_embedding_tensor.shape[1]
     pos_count = 0
     neg_count = 0
     arg1_list, arg2_list = [], []
@@ -83,14 +84,14 @@ def prepare_embd(result, dataset, lm_model_name, annotation, kg_model_name, on_t
             pos_count += 1
             arg1_list.append(arg1_embd)
         except KeyError:
-            arg1_list.append(np.zeros(200))
+            arg1_list.append(np.zeros(embd_shape))
             neg_count += 1
         try:
             arg2_embd = get_kg_embd(arg2, entity_embedding_tensor, result)
             pos_count += 1
             arg2_list.append(arg2_embd)
         except KeyError:
-            arg2_list.append(np.zeros(200))
+            arg2_list.append(np.zeros(embd_shape))
             neg_count += 1
     logging.info(f"pos: {pos_count}, neg: {neg_count}, ratio: {pos_count / (pos_count + neg_count)}")
 
