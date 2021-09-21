@@ -1,6 +1,13 @@
 from util import load_from_bin
 from pprint import pprint
 
+
+def export_data():
+    pass
+
+
+
+
 df = load_from_bin("test_sci_lm_kg_dp")
 print(df.columns)
 df = df[["pmid", "relation_pred", "Arg1", "Arg2"]]

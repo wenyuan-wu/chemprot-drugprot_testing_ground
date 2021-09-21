@@ -25,7 +25,7 @@ def label_evaluate(lm_model_name, annotation, kg_model_name="None", on_tiny=Fals
 def main():
     kg_models = ["TransE", "PairRE"]
     models = [
-        "bert-base-uncased",
+        # "bert-base-uncased",
         "allenai/scibert_scivocab_uncased",
         "dmis-lab/biobert-base-cased-v1.1",
     ]

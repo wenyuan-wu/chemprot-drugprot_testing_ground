@@ -108,7 +108,7 @@ def prepare_embd(result, dataset, lm_model_name, annotation, kg_model_name, on_t
 def main():
     kg_models = ["TransE", "PairRE"]
     models = [
-        "bert-base-uncased",
+        # "bert-base-uncased",
         "allenai/scibert_scivocab_uncased",
         "dmis-lab/biobert-base-cased-v1.1",
     ]

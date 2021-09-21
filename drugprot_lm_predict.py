@@ -98,31 +98,31 @@ def lm_predict(args: dict) -> None:
 
 def main():
     # # args on GPU server
-    # args = {
-    #     "model_name": "bert-base-uncased",
-    #     "annotation": "raw",
-    #     "dataset": "development",
-    #     "max_length": 192,
-    #     "on_tiny": False,
-    #     "batch_size": 32,
-    #     "device_ids": [0, 1],
-    #     "local_files_only": True,
-    # }
-
-    # args on local machine
     args = {
         "model_name": "bert-base-uncased",
         "annotation": "raw",
         "dataset": "development",
         "max_length": 192,
-        "on_tiny": True,
-        "batch_size": 8,
+        "on_tiny": False,
+        "batch_size": 32,
         "device_ids": [0, 1],
         "local_files_only": True,
     }
 
+    # args on local machine
+    # args = {
+    #     "model_name": "bert-base-uncased",
+    #     "annotation": "raw",
+    #     "dataset": "development",
+    #     "max_length": 192,
+    #     "on_tiny": True,
+    #     "batch_size": 8,
+    #     "device_ids": [0, 1],
+    #     "local_files_only": True,
+    # }
+
     models = [
-        "bert-base-uncased",
+        # "bert-base-uncased",
         "allenai/scibert_scivocab_uncased",
         "dmis-lab/biobert-base-cased-v1.1",
     ]
