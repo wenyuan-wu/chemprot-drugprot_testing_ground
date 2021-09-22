@@ -119,7 +119,7 @@ def main():
         for dataset in datasets:
             for model in models:
                 for annotation in annotations:
-                    # prepare_embd(result, dataset, model, annotation, kg_model)
+                    prepare_embd(result, dataset, model, annotation, kg_model)
                     prepare_embd(result, dataset, model, annotation, kg_model, on_tiny=True)
 
 

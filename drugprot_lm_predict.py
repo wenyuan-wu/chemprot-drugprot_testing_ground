@@ -122,7 +122,7 @@ def main():
     # }
 
     models = [
-        # "bert-base-uncased",
+        "bert-base-uncased",
         "allenai/scibert_scivocab_uncased",
         "dmis-lab/biobert-base-cased-v1.1",
     ]
