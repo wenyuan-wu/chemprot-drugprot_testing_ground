@@ -25,7 +25,7 @@ def label_evaluate(lm_model_name, annotation, kg_model_name="None", on_tiny=Fals
 def main():
     kg_models = ["TransE", "PairRE"]
     models = [
-        # "bert-base-uncased",
+        "bert-base-uncased",
         "allenai/scibert_scivocab_uncased",
         "dmis-lab/biobert-base-cased-v1.1",
     ]
@@ -34,23 +34,23 @@ def main():
     for lm_model in models:
         for annotation in annotations:
             logging.info(f"model: {lm_model}, annotation: {annotation}")
-            result = label_evaluate(lm_model, annotation, on_tiny=True, on_lm=True)
-            # result = label_evaluate(lm_model, annotation, on_tiny=False, on_lm=True)
+            # result = label_evaluate(lm_model, annotation, on_tiny=True, on_lm=True)
+            result = label_evaluate(lm_model, annotation, on_tiny=False, on_lm=True)
             logging.info("accuracy: {:.3f}".format(result[0]))
             logging.info("precision: {:.3f}".format(result[1]))
             logging.info("recall: {:.3f}".format(result[2]))
             logging.info("f1 score: {:.3f}".format(result[3]))
-
-    for kg_model in kg_models:
-        for lm_model in models:
-            for annotation in annotations:
-                logging.info(f"kg_model: {kg_model}, lm_model: {lm_model}, annotation: {annotation}")
-                result = label_evaluate(lm_model, annotation, kg_model, on_tiny=True, on_lm=False)
-                # result = label_evaluate(lm_model, annotation, kg_model, on_tiny=False, on_lm=False)
-                logging.info("accuracy: {:.3f}".format(result[0]))
-                logging.info("precision: {:.3f}".format(result[1]))
-                logging.info("recall: {:.3f}".format(result[2]))
-                logging.info("f1 score: {:.3f}".format(result[3]))
+    #
+    # for kg_model in kg_models:
+    #     for lm_model in models:
+    #         for annotation in annotations:
+    #             logging.info(f"kg_model: {kg_model}, lm_model: {lm_model}, annotation: {annotation}")
+    #             result = label_evaluate(lm_model, annotation, kg_model, on_tiny=True, on_lm=False)
+    #             # result = label_evaluate(lm_model, annotation, kg_model, on_tiny=False, on_lm=False)
+    #             logging.info("accuracy: {:.3f}".format(result[0]))
+    #             logging.info("precision: {:.3f}".format(result[1]))
+    #             logging.info("recall: {:.3f}".format(result[2]))
+    #             logging.info("f1 score: {:.3f}".format(result[3]))
 
 
 if __name__ == '__main__':

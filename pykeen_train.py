@@ -1,10 +1,12 @@
 import numpy as np
 import pykeen.utils
 from pykeen.pipeline import pipeline
+from pykeen.triples import TriplesFactory
 import pandas as pd
 from tqdm import tqdm
 from util import load_from_bin, save_to_bin
 import logging
+import os
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO,
@@ -36,8 +38,8 @@ def concatenate_embd(arr1, arr2, arr3):
 
 
 def train_kg_model(model_name="PairRE",
-                   train_path="data/drugprot_preprocessed/kg/drugprot_kg_train_combi.tsv",
-                   test_path="data/drugprot_preprocessed/kg/drugprot_kg_dev.tsv"):
+                   train_path="/data/wenywu/old-data/wenywu/data/chemprot_testing_ground/data/drugprot_preprocessed/kg/drugprot_kg_train_combi.tsv",
+                   test_path="/data/wenywu/old-data/wenywu/data/chemprot_testing_ground/data/drugprot_preprocessed/kg/drugprot_kg_dev.tsv"):
     """
     Function to train a knowledge graph model via pykeen
     :param model_name: name of the model, i.e. transE, PairRE
@@ -106,16 +108,19 @@ def prepare_embd(result, dataset, lm_model_name, annotation, kg_model_name, on_t
 
 
 def main():
-    kg_models = ["TransE", "PairRE"]
+    # kg_models = ["TransE", "PairRE"]
+    kg_models = ["TransE"]
     models = [
-        # "bert-base-uncased",
+        "bert-base-uncased",
         "allenai/scibert_scivocab_uncased",
         "dmis-lab/biobert-base-cased-v1.1",
     ]
     annotations = ["raw", "sci", "bio"]
     datasets = ["training", "development", "test"]
+    train_path = os.path.join(os.getcwd(), "data/drugprot_preprocessed/kg/drugprot_kg_train_combi.tsv")
+    test_path = os.path.join(os.getcwd(), "data/drugprot_preprocessed/kg/drugprot_kg_dev.tsv")
     for kg_model in kg_models:
-        result = train_kg_model(kg_model)
+        result = train_kg_model(kg_model, train_path, test_path)
         for dataset in datasets:
             for model in models:
                 for annotation in annotations:
