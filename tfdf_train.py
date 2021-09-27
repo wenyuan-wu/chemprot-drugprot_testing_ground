@@ -59,13 +59,13 @@ def main():
     for kg_model in kg_models:
         for lm_model in models:
             for annotation in annotations:
-                model = tfdf_train(kg_model, "training", lm_model, annotation, True)
-                # model = tfdf_train(kg_model, "training", lm_model, annotation)
+                # model = tfdf_train(kg_model, "training", lm_model, annotation, True)
+                model = tfdf_train(kg_model, "training", lm_model, annotation)
                 for dataset in datasets:
                     logging.info(f"kg_model: {kg_model}, dataset: {dataset}")
                     logging.info(f"lm_model: {lm_model}, annotation: {annotation}")
-                    tfdf_predict(model, kg_model, dataset, lm_model, annotation, True)
-                    # tfdf_predict(model, kg_model, dataset, lm_model, annotation)
+                    # tfdf_predict(model, kg_model, dataset, lm_model, annotation, True)
+                    tfdf_predict(model, kg_model, dataset, lm_model, annotation)
 
 
 if __name__ == '__main__':
