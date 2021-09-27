@@ -55,7 +55,7 @@ def main():
         "dmis-lab/biobert-base-cased-v1.1",
     ]
     annotations = ["raw", "sci", "bio"]
-    datasets = ["development", "test"]
+    datasets = ["development"]
     for kg_model in kg_models:
         for lm_model in models:
             for annotation in annotations:

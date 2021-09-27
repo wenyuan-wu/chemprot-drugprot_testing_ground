@@ -8,35 +8,21 @@ import numpy as np
 from util import load_from_bin, save_to_bin
 import tensorflow as tf
 from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score, confusion_matrix
+import torch
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO,
                     # datefmt='%d-%b-%y %H:%M:%S'
                     )
 
-kg_models = ["TransE", "PairRE"]
-models = [
-    "bert-base-uncased",
-    "allenai/scibert_scivocab_uncased",
-    "dmis-lab/biobert-base-cased-v1.1",
-]
-annotations = ["raw", "sci", "bio"]
-datasets = ["development", "test"]
+my_pykeen_model = torch.load('model/PairRE/trained_model.pkl')
 
-kg_model = "TransE"
-lm_model = "bert-base-uncased"
-annotation = "raw"
-on_tiny = True
-model_ann_name = lm_model + "_" + annotation + "_tiny_ft" \
-    if on_tiny else lm_model + "_" + annotation + "_ft"
-label_name = f"label_tfdf_{kg_model}_{model_ann_name}"
-print(label_name)
+# Print model's state_dict
+print("Model's state_dict:")
+for param_tensor in my_pykeen_model.state_dict():
+    print(param_tensor, "\t", my_pykeen_model.state_dict()[param_tensor].size())
 
-df = load_from_bin("development_tiny")
-y_pred = df[label_name].values
-y_true = df["label"].values
-
-print(y_pred[:3])
-print(y_true[:3])
-
-print(f1_score(y_true, y_pred, average="micro"))
+entity_embedding_tensor = my_pykeen_model.state_dict()["entity_representations.0._embeddings.weight"].cpu().detach().numpy()
+logging.info(f"sheep: {entity_embedding_tensor.shape}")
+embd_shape = entity_embedding_tensor.shape[1]
+print(embd_shape)

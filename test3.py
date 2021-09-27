@@ -2,6 +2,7 @@ import torch
 # from transformers import BertTokenizer, BertForSequenceClassification
 import logging
 import os
+from util import load_from_bin
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO,
@@ -18,9 +19,9 @@ def path_test(path):
 
 
 def main():
-    file_path = os.path.join(os.getcwd(), "drugprot_kg_train_combi.tsv")
-    print(file_path)
-    path_test(file_path)
+    vdict = load_from_bin("PairRE_entity_to_id")
+    for k, v in vdict.items():
+        print(k, v)
 
 
 if __name__ == '__main__':
