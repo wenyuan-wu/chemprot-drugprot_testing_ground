@@ -19,14 +19,14 @@ def process_test_set_large(lm_model_name, annotation, kg_model_name=None, on_tin
         "dataset": "test_large",
         "max_length": 192,
         "on_tiny": on_tiny,
-        "batch_size": 8,
+        "batch_size": 32,
         "device_ids": [0, 1],
         "local_files_only": True,
     }
     lm_predict(args)
     if kg_model_name:
-        prepare_embd(kg_model_name, "test", kg_model_name, annotation, on_tiny=on_tiny)
-        tfdf_predict(kg_model_name, "test", lm_model_name, annotation, on_tiny=on_tiny)
+        prepare_embd(kg_model_name, "test_large", kg_model_name, annotation, on_tiny=on_tiny)
+        tfdf_predict(kg_model_name, "test_large", lm_model_name, annotation, on_tiny=on_tiny)
 
 
 def export_data_large(lm_model_name, annotation, file_name, kg_model_name=None, on_tiny=False):
@@ -56,21 +56,21 @@ def main():
     data_dict = create_data_dict(abs_df, ent_df, rel_df)
     prepare_data(data_dict, dataset=dataset)
 
-    lm_model_name = "allenai/scibert_scivocab_uncased"
-    annotation = "sci"
-    kg_model_name = None
-    on_tiny = False
-    file_name = "test_large_predict_scibert_sci_v2.0.tsv"
-    process_test_set_large(lm_model_name, annotation, kg_model_name, on_tiny)
-    export_data_large(lm_model_name, annotation, file_name, kg_model_name, on_tiny)
-
-    lm_model_name = "allenai/scibert_scivocab_uncased"
-    annotation = "sci"
-    kg_model_name = "TransE"
-    on_tiny = False
-    file_name = "test_large_predict_scibert_sci_transe_v2.0.tsv"
-    process_test_set_large(lm_model_name, annotation, kg_model_name, on_tiny)
-    export_data_large(lm_model_name, annotation, file_name, kg_model_name, on_tiny)
+    # lm_model_name = "allenai/scibert_scivocab_uncased"
+    # annotation = "sci"
+    # kg_model_name = None
+    # on_tiny = False
+    # file_name = "test_large_predict_scibert_sci_v2.0.tsv"
+    # process_test_set_large(lm_model_name, annotation, kg_model_name, on_tiny)
+    # export_data_large(lm_model_name, annotation, file_name, kg_model_name, on_tiny)
+    #
+    # lm_model_name = "allenai/scibert_scivocab_uncased"
+    # annotation = "sci"
+    # kg_model_name = "TransE"
+    # on_tiny = False
+    # file_name = "test_large_predict_scibert_sci_transe_v2.0.tsv"
+    # process_test_set_large(lm_model_name, annotation, kg_model_name, on_tiny)
+    # export_data_large(lm_model_name, annotation, file_name, kg_model_name, on_tiny)
 
 
 if __name__ == '__main__':

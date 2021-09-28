@@ -17,7 +17,7 @@ def process_test_set(lm_model_name, annotation, kg_model_name=None, on_tiny=Fals
         "dataset": "test",
         "max_length": 192,
         "on_tiny": on_tiny,
-        "batch_size": 8,
+        "batch_size": 32,
         "device_ids": [0, 1],
         "local_files_only": True,
     }
