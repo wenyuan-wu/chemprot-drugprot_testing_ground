@@ -23,7 +23,7 @@ def process_test_set(lm_model_name, annotation, kg_model_name=None, on_tiny=Fals
     }
     lm_predict(args)
     if kg_model_name:
-        prepare_embd(kg_model_name, "test", kg_model_name, annotation, on_tiny=on_tiny)
+        prepare_embd(kg_model_name, "test", lm_model_name, annotation, on_tiny=on_tiny)
         tfdf_predict(kg_model_name, "test", lm_model_name, annotation, on_tiny=on_tiny)
 
 
