@@ -10,6 +10,7 @@ data/*
 
 # not to ignore
 !data/data_download.sh
+!data/data_download_large.sh
 
 # saved model
 model/

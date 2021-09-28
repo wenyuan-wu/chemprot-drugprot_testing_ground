@@ -4,6 +4,7 @@ from tqdm import tqdm
 import pandas as pd
 from util import load_from_bin, save_to_bin
 import numpy as np
+# import pickle5 as pickle
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO,
@@ -48,6 +49,7 @@ def prepare_embd(kg_model_name, dataset, lm_model_name, annotation, on_tiny=Fals
     model_ann_name = lm_model_name + "_" + annotation + "_tiny_ft" \
         if on_tiny else lm_model_name + "_" + annotation + "_ft"
     my_pykeen_model = torch.load(f'model/{kg_model_name}/trained_model.pkl')
+    # my_pykeen_model = pickle.load(f'model/{kg_model_name}/trained_model.pkl')
     entity_embd_name = "NONE"
     if kg_model_name == "TransE":
         entity_embd_name = "entity_embeddings._embeddings.weight"

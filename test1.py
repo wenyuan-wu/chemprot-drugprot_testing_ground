@@ -7,17 +7,17 @@ from pprint import pprint
 idx_dict = load_from_bin("idx_to_label_dict")
 pprint(idx_dict)
 
-train_tiny = load_from_bin("training_tiny")
+train_tiny = load_from_bin("training")
 print(train_tiny.head(3))
 print(train_tiny.columns)
 print(train_tiny.shape)
 
-dev_tiny = load_from_bin("development_tiny")
+dev_tiny = load_from_bin("development")
 print(dev_tiny.head(3))
 print(dev_tiny.columns)
 print(dev_tiny.shape)
 
-test_tiny = load_from_bin("test_tiny")
+test_tiny = load_from_bin("test")
 print(test_tiny.head(3))
 print(test_tiny.columns)
 print(test_tiny.shape)

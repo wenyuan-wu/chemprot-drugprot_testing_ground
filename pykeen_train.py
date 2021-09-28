@@ -30,7 +30,7 @@ def train_kg_model(model_name="PairRE",
         model=model_name,
         # epochs=128,  # short epochs for testing - you should go higher TODO: non-functional, and random seed
     )
-    result.save_to_directory(f'model/{model_name}')
+    result.save_to_directory(f'model/{model_name}', protocal=4)
     save_to_bin(result.training.entity_to_id, f"{model_name}_entity_to_id")
     return result
 

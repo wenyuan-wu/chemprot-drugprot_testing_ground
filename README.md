@@ -247,5 +247,120 @@ Name: relation, dtype: int64
 | scibert_uncased | scibert | yes | 0.586 |
 | biobert_base_v1.1 | biobert | yes | 0.581 |
 
+## New Results
+| Base Language Model | Annotation Style | Knowledge Graph Model | F1 Score on Development Set |
+| --- | --- | --- | --- |
+| bert_base_uncased | raw | none | 0.765 |
+| bert_base_uncased | SciBert | none | 0.864 |
+| bert_base_uncased | BioBert | none | 0.863 |
+| scibert_scivocab_uncased | raw | none | 0.776 |
+| scibert_scivocab_uncased | SciBert | none | 0.876 |
+| scibert_scivocab_uncased | BioBert | none | 0.869 |
+| biobert-base-cased-v1.1 | raw | none | 0.776 |
+| biobert-base-cased-v1.1 | SciBert | none | 0.876 |
+| biobert-base-cased-v1.1 | BioBert | none | 0.875 |
+| bert_base_uncased | raw | TransE | 0.768 |
+| bert_base_uncased | SciBert | TransE | 0.858 |
+| bert_base_uncased | BioBert | TransE | 0.856 |
+| scibert_scivocab_uncased | raw | TransE | 0.776 |
+| scibert_scivocab_uncased | SciBert | TransE | 0.872 |
+| scibert_scivocab_uncased | BioBert | TransE | 0.868 |
+| biobert-base-cased-v1.1 | raw | TransE | 0.778 |
+| biobert-base-cased-v1.1 | SciBert | TransE | 0.873 |
+| biobert-base-cased-v1.1 | BioBert | TransE | 0.863 |
+| bert_base_uncased | raw | PairRE | 0.769 |
+| bert_base_uncased | SciBert | PairRE | 0.858 |
+| bert_base_uncased | BioBert | PairRE | 0.857 |
+| scibert_scivocab_uncased | raw | PairRE | 0.779 |
+| scibert_scivocab_uncased | SciBert | PairRE | 0.871 |
+| scibert_scivocab_uncased | BioBert | PairRE | 0.867 |
+| biobert-base-cased-v1.1 | raw | PairRE | 0.778 |
+| biobert-base-cased-v1.1 | SciBert | PairRE | 0.872 |
+| biobert-base-cased-v1.1 | BioBert | PairRE | 0.862 |
+
 ## Code structure
 drugprot_preprocess_data
+
+```
+2021-09-28 02:08:03,003 - INFO - model: bert-base-uncased, annotation: raw
+2021-09-28 02:08:03,003 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:04,139 - INFO - f1 score: 0.765
+2021-09-28 02:08:04,139 - INFO - model: bert-base-uncased, annotation: sci
+2021-09-28 02:08:04,139 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:04,939 - INFO - f1 score: 0.864
+2021-09-28 02:08:04,940 - INFO - model: bert-base-uncased, annotation: bio
+2021-09-28 02:08:04,940 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:05,764 - INFO - f1 score: 0.863
+2021-09-28 02:08:05,764 - INFO - model: allenai/scibert_scivocab_uncased, annotation: raw
+2021-09-28 02:08:05,764 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:06,553 - INFO - f1 score: 0.776
+2021-09-28 02:08:06,553 - INFO - model: allenai/scibert_scivocab_uncased, annotation: sci
+2021-09-28 02:08:06,553 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:07,344 - INFO - f1 score: 0.876
+2021-09-28 02:08:07,344 - INFO - model: allenai/scibert_scivocab_uncased, annotation: bio
+2021-09-28 02:08:07,344 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:08,177 - INFO - f1 score: 0.869
+2021-09-28 02:08:08,177 - INFO - model: dmis-lab/biobert-base-cased-v1.1, annotation: raw
+2021-09-28 02:08:08,177 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:08,964 - INFO - f1 score: 0.776
+2021-09-28 02:08:08,964 - INFO - model: dmis-lab/biobert-base-cased-v1.1, annotation: sci
+2021-09-28 02:08:08,964 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:09,750 - INFO - f1 score: 0.876
+2021-09-28 02:08:09,750 - INFO - model: dmis-lab/biobert-base-cased-v1.1, annotation: bio
+2021-09-28 02:08:09,750 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:10,545 - INFO - f1 score: 0.875
+2021-09-28 02:08:10,545 - INFO - kg_model: TransE, lm_model: bert-base-uncased, annotation: raw
+2021-09-28 02:08:10,545 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:11,366 - INFO - f1 score: 0.768
+2021-09-28 02:08:11,366 - INFO - kg_model: TransE, lm_model: bert-base-uncased, annotation: sci
+2021-09-28 02:08:11,367 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:12,151 - INFO - f1 score: 0.858
+2021-09-28 02:08:12,151 - INFO - kg_model: TransE, lm_model: bert-base-uncased, annotation: bio
+2021-09-28 02:08:12,151 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:12,936 - INFO - f1 score: 0.856
+2021-09-28 02:08:12,937 - INFO - kg_model: TransE, lm_model: allenai/scibert_scivocab_uncased, annotation: raw
+2021-09-28 02:08:12,937 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:13,723 - INFO - f1 score: 0.776
+2021-09-28 02:08:13,723 - INFO - kg_model: TransE, lm_model: allenai/scibert_scivocab_uncased, annotation: sci
+2021-09-28 02:08:13,723 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:14,541 - INFO - f1 score: 0.872
+2021-09-28 02:08:14,541 - INFO - kg_model: TransE, lm_model: allenai/scibert_scivocab_uncased, annotation: bio
+2021-09-28 02:08:14,541 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:15,326 - INFO - f1 score: 0.868
+2021-09-28 02:08:15,326 - INFO - kg_model: TransE, lm_model: dmis-lab/biobert-base-cased-v1.1, annotation: raw
+2021-09-28 02:08:15,326 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:16,110 - INFO - f1 score: 0.778
+2021-09-28 02:08:16,110 - INFO - kg_model: TransE, lm_model: dmis-lab/biobert-base-cased-v1.1, annotation: sci
+2021-09-28 02:08:16,110 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:16,894 - INFO - f1 score: 0.873
+2021-09-28 02:08:16,894 - INFO - kg_model: TransE, lm_model: dmis-lab/biobert-base-cased-v1.1, annotation: bio
+2021-09-28 02:08:16,894 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:17,712 - INFO - f1 score: 0.863
+2021-09-28 02:08:17,712 - INFO - kg_model: PairRE, lm_model: bert-base-uncased, annotation: raw
+2021-09-28 02:08:17,712 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:18,495 - INFO - f1 score: 0.769
+2021-09-28 02:08:18,495 - INFO - kg_model: PairRE, lm_model: bert-base-uncased, annotation: sci
+2021-09-28 02:08:18,495 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:19,280 - INFO - f1 score: 0.858
+2021-09-28 02:08:19,280 - INFO - kg_model: PairRE, lm_model: bert-base-uncased, annotation: bio
+2021-09-28 02:08:19,280 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:20,099 - INFO - f1 score: 0.857
+2021-09-28 02:08:20,099 - INFO - kg_model: PairRE, lm_model: allenai/scibert_scivocab_uncased, annotation: raw
+2021-09-28 02:08:20,099 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:20,883 - INFO - f1 score: 0.779
+2021-09-28 02:08:20,883 - INFO - kg_model: PairRE, lm_model: allenai/scibert_scivocab_uncased, annotation: sci
+2021-09-28 02:08:20,883 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:21,667 - INFO - f1 score: 0.871
+2021-09-28 02:08:21,667 - INFO - kg_model: PairRE, lm_model: allenai/scibert_scivocab_uncased, annotation: bio
+2021-09-28 02:08:21,667 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:22,450 - INFO - f1 score: 0.867
+2021-09-28 02:08:22,450 - INFO - kg_model: PairRE, lm_model: dmis-lab/biobert-base-cased-v1.1, annotation: raw
+2021-09-28 02:08:22,450 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:23,268 - INFO - f1 score: 0.778
+2021-09-28 02:08:23,268 - INFO - kg_model: PairRE, lm_model: dmis-lab/biobert-base-cased-v1.1, annotation: sci
+2021-09-28 02:08:23,268 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:24,051 - INFO - f1 score: 0.872
+2021-09-28 02:08:24,052 - INFO - kg_model: PairRE, lm_model: dmis-lab/biobert-base-cased-v1.1, annotation: bio
+2021-09-28 02:08:24,052 - INFO - Loading file from data/drugprot_preprocessed/bin/development
+2021-09-28 02:08:24,841 - INFO - f1 score: 0.862
+```

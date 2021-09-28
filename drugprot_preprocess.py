@@ -65,6 +65,29 @@ def get_df_from_data_test() -> Tuple[Any, Any]:
     return abs_df, ent_df
 
 
+def get_df_from_data_test_large() -> Tuple[Any, Any]:
+    """
+    Function to create pandas DataFrame from tsv data files, test set only
+    :return: pandas dataframe w.r.t. dataset
+    """
+    # Drugprot test set
+    data_path = join("data", "large-scale-drugprot")
+
+    # abstracts
+    abs_file_name = join(data_path, "large_scale" + "_abstracts" + ".tsv")
+    logging.info(f"loading data from {abs_file_name}")
+    abs_col_names = ["Title", "Abstract"]
+    abs_df = pd.read_csv(abs_file_name, sep="\t", names=abs_col_names, index_col=0, keep_default_na=False)
+
+    # entity mention annotations
+    ent_file_name = join(data_path, "large_scale" + "_entities" + ".tsv")
+    logging.info(f"loading data from {ent_file_name}")
+    ent_col_names = ["Entity #", "Type", "Start", "End", "Text"]
+    ent_df = pd.read_csv(ent_file_name, sep="\t", names=ent_col_names, index_col=0, keep_default_na=False)
+
+    return abs_df, ent_df
+
+
 def check_sub_range(range_1: range, range_2: range) -> set:
     """
     Function to check if two range has intersection
